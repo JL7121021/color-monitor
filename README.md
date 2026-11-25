@@ -5,7 +5,7 @@
 
 Watch 1–3 screen areas in real time using browser screen sharing. Set sensitivity thresholds, trigger alarm sound/banners, schedule monitoring, and switch visual themes. Everything is in a single HTML file — no backend, no dependencies, no build step.
 
-> This repo contains only the latest version, **v2.9.5**. Older versions are not included.
+> This repo contains only the latest version, **v2.9.6**. Older versions are not included.
 
 - **Live demo:** <https://jl7121021.github.io/color-monitor/>
 - **Source code:** <https://github.com/JL7121021/color-monitor>
@@ -18,13 +18,17 @@ Watch 1–3 screen areas in real time using browser screen sharing. Set sensitiv
 - Sensitivity threshold (1–50%) with live color-delta percentage
 - Alarm sound and banner (must be cleared with **Dismiss alarm**)
 - Start/stop scheduling (browser policy still requires one manual click when a schedule fires)
-- Traditional Chinese / English switching at runtime
-- 8 visual styles with a Day / Night mode that applies to all of them, plus saved/exportable/importable looks
-- Three-step on-screen coach mark that advances with the actual state (start → place probe → live/alarm), dismissible and bilingual
+- EN / zh-HK switching at runtime (defaults to English)
+- 8 visual styles (defaults to Neumorphism) with a header `Dark / Light` toggle that applies to all of them, plus saved/exportable/importable looks
+- Header controls stay compact and ordered `UI | Dark / Light | EN / zh-HK | ?`; the `?` help is a bare glyph with no button frame
+- Three-step on-screen coach mark with Previous/Next controls; Step 2 stays until you press Next, and the guide can be reopened from the bottom-centre `Guide` / `指引` button after dismissal
+- Step 2 explains how to drag the crosshair onto the pixel to sample: the zone number and live sampled RGB color are shown at the crosshair
 - First sample waits for two fresh decoded video frames, so the initial color and baseline are correct
 - Built-in self-test: five checks with no alarm side effects
-- Long-running health monitoring: last sample age, stall watchdog, 10-minute heartbeat log, and automatic resync when the tab becomes visible
-- In-app version history (click the version tag in the header)
+- Long-running health monitoring: last sample time (`HH:MM:SS`) with a flashing dot on each completed sample, stall watchdog, 10-minute heartbeat log, and automatic resync when the tab becomes visible
+- In-app guide with GitHub repo and ★ Star links visible in both languages; close it with the sticky top-right ✕, Esc, or a click on the backdrop
+- In-app version history is collapsed by default, hides dates, and shows a ▾ / ▴ disclosure arrow (click the version tag in the header)
+- Visual polish: no repeated grid/dots page texture, restrained sub-card corner radii, and a single top-left light source shared by the centre stage and right sidebar in Neumorphism
 
 ## Usage
 
@@ -57,7 +61,7 @@ All settings, themes, and zone coordinates are stored only in your own browser's
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | Full application, v2.9.5 |
+| `index.html` | Full application, v2.9.6 |
 | `CHANGELOG.md` | Change history |
 | `LICENSE` | MIT license |
 | `.gitignore` | Git ignore rules |
