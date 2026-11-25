@@ -13,12 +13,15 @@
       try {
         if (localStorage.getItem(P + ':remember') === '0') return;
         var s = JSON.parse(localStorage.getItem(P) || '{}') || {};
-        if (s.style) document.documentElement.setAttribute('data-style', s.style);
+        /* v2.9.4 removed Glass / Liquid Glass; never restore a dead style. */
+        var known = { original: 1, neumorph: 1, brutal: 1, neubrutal: 1,
+                      clay: 1, editorial: 1, terminal: 1, aurora: 1 };
+        if (s.style && known[s.style]) document.documentElement.setAttribute('data-style', s.style);
       } catch (e) { /* first visit / storage blocked */ }
     })();
   </script>
 
-  <title>多區域色彩監控器 v2.9.3 · Multi-Zone Color Monitor</title>
+  <title>多區域色彩監控器 v2.9.4 · Multi-Zone Color Monitor</title>
   <style>
     /* ==========================================================================
        Theme 1: 經典紫藍 (Default Dark Mode)
@@ -1451,8 +1454,7 @@
     .color-swatch, .box-label, .resize-handle, .nb-alert-tag { border-color: var(--ui-rim); }
 
     /* MON / version / help chips belong to the brand row, so they follow the
-       same radius, rim, shadow and sheen as every other control instead of
-       keeping their hard 2px-offset look under Liquid Glass. */
+       same radius, rim, shadow and sheen as every other control. */
     .version-tag, .nb-icon-box, .nb-mini-tag {
       border-color: var(--ui-rim);
       border-width: var(--ui-border-w);
@@ -1484,51 +1486,13 @@
       --ui-text-shadow: 1px 1px 0 var(--stroke-color);
     }
 
-    /* --- 2. Glass ------------------------------------------------------ */
-    [data-style="glass"] body {
-      --ui-radius: 18px; --ui-radius-sm: 999px; --ui-border-w: 1px;
-      --ui-rim: rgb(255 255 255 / 0.55);
-      --ui-surface: color-mix(in srgb, var(--main-color) 62%, transparent);
-      --ui-subsurface: color-mix(in srgb, var(--subpanel-bg) 70%, transparent);
-      --ui-backdrop: blur(18px) saturate(1.4);
-      --ui-shadow: 0 24px 50px -28px rgb(0 0 0 / 0.7);
-      --ui-shadow-sm: 0 6px 16px -10px rgb(0 0 0 / 0.6);
-      --ui-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 48%);
-      --ui-text-shadow: none;
-    }
-
-    /* --- 3. Liquid Glass (Apple-style material) ------------------------ */
-    [data-style="liquid"] body {
-      --ui-radius: 26px; --ui-radius-sm: 999px; --ui-border-w: 1px;
-      --ui-rim: rgb(255 255 255 / 0.72);
-      --ui-surface: color-mix(in srgb, var(--main-color) 50%, transparent);
-      --ui-subsurface: color-mix(in srgb, var(--subpanel-bg) 62%, transparent);
-      --ui-backdrop: blur(30px) saturate(1.9);
-      --ui-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.85),
-        inset 0 -1px 0 rgb(255 255 255 / 0.22),
-        0 22px 48px -24px rgb(0 0 0 / 0.7);
-      --ui-shadow-sm:
-        inset 0 1px 0 rgb(255 255 255 / 0.7),
-        0 8px 18px -12px rgb(0 0 0 / 0.6);
-      --ui-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.22), transparent 45%);
-      --ui-text-shadow: none;
-    }
-    /* Cards need a containing block for the ::after sheen. The panel must NOT
-       be made relative — that knocks it out of its fixed corner and into the
-       page flow, so opening it would push the whole layout around. */
-    [data-style="liquid"] .card { position: relative; }
-    [data-style="liquid"] .card::after,
-    [data-style="liquid"] .theme-panel::after {
-      content: ""; position: absolute; inset: 0; border-radius: inherit;
-      pointer-events: none; z-index: 1;
-      background: radial-gradient(130% 90% at 12% -10%, rgb(255 255 255 / 0.28), transparent 58%);
-    }
-
-    /* --- 4. Neumorphism ------------------------------------------------ */
+    /* --- 2. Neumorphism ------------------------------------------------ */
     [data-style="neumorph"] body {
-      --ui-radius: 22px; --ui-radius-sm: 14px; --ui-border-w: 0px;
-      --ui-rim: transparent;
+      --ui-radius: 22px; --ui-radius-sm: 14px; --ui-pill: 14px;
+      /* v2.9.4: a zero-width transparent rim made every separator, input and
+         status chip invisible. Keep a subtle solid boundary for legibility. */
+      --ui-border-w: 1px;
+      --ui-rim: color-mix(in srgb, var(--headline-color) 38%, var(--bg-color));
       --ui-surface: var(--bg-color); --ui-subsurface: var(--bg-color);
       --ui-shadow:
         10px 10px 24px rgb(0 0 0 / 0.6),
@@ -1536,10 +1500,11 @@
       --ui-shadow-sm:
         4px 4px 10px rgb(0 0 0 / 0.55),
         -4px -4px 10px rgb(255 255 255 / 0.06);
+      --ui-sheen: none;
       --ui-text-shadow: none;
     }
 
-    /* --- 5. Brutalism -------------------------------------------------- */
+    /* --- 3. Brutalism -------------------------------------------------- */
     [data-style="brutal"] body {
       --ui-radius: 0px; --ui-radius-sm: 0px; --ui-pill: 0px;
       --ui-border-w: 3px;
@@ -1550,7 +1515,7 @@
       --ui-heading-transform: uppercase;
     }
 
-    /* --- 6. Dark Neubrutalism (the reference design) ------------------- */
+    /* --- 4. Dark Neubrutalism (the reference design) ------------------- */
     [data-style="neubrutal"] body {
       --ui-radius: 12px; --ui-radius-sm: 9px; --ui-border-w: 3px;
       --ui-rim: #010101;
@@ -1565,7 +1530,7 @@
       transform: translate(2px, 2px); box-shadow: 2px 2px 0 #010101;
     }
 
-    /* --- 7. Clay ------------------------------------------------------- */
+    /* --- 5. Clay ------------------------------------------------------- */
     [data-style="clay"] body {
       --ui-radius: 26px; --ui-radius-sm: 14px; --ui-border-w: 1px;
       --ui-rim: color-mix(in srgb, var(--headline-color) 18%, transparent);
@@ -1579,7 +1544,7 @@
       --ui-text-shadow: none;
     }
 
-    /* --- 8. Editorial -------------------------------------------------- */
+    /* --- 6. Editorial -------------------------------------------------- */
     [data-style="editorial"] body {
       --ui-radius: 4px; --ui-radius-sm: 2px; --ui-border-w: 1px;
       --ui-rim: color-mix(in srgb, var(--headline-color) 32%, transparent);
@@ -1588,7 +1553,7 @@
       --ui-text-shadow: none;
     }
 
-    /* --- 9. Terminal --------------------------------------------------- */
+    /* --- 7. Terminal --------------------------------------------------- */
     [data-style="terminal"] body {
       --ui-radius: 0px; --ui-radius-sm: 0px; --ui-pill: 0px;
       --ui-border-w: 1px; --ui-border-style: dashed;
@@ -1599,7 +1564,7 @@
       --ui-text-shadow: none;
     }
 
-    /* --- 10. Aurora ---------------------------------------------------- */
+    /* --- 8. Aurora ---------------------------------------------------- */
     [data-style="aurora"] body {
       --ui-radius: 18px; --ui-radius-sm: 999px; --ui-border-w: 1px;
       --ui-rim: color-mix(in srgb, var(--button-bg) 45%, transparent);
@@ -1752,7 +1717,7 @@
     }
 
     /* =======================================================================
-       v2.9.3 — health watchdog, self-test, precision sampling, anchored looks panel
+       v2.9.4 — first-frame gating, next-step guide, 8 styles, Neumorphism fixes
        ======================================================================= */
 
     /* --- one compact header; every appearance control moved to the panel -- */
@@ -1826,94 +1791,85 @@
     #styleChips.chips { flex: none; flex-wrap: wrap; overflow: visible; }
     .color-picker-row { display: flex; align-items: center; gap: 8px; }
 
-    /* --- Liquid Glass, following the iOS 26/27 material language --------- */
-    html[data-style="liquid"] {
-      background:
-        linear-gradient(180deg, rgb(7 7 12 / 0.42), rgb(7 7 12 / 0.78)),
-        radial-gradient(58% 50% at 12% 6%, #6a5cff 0%, transparent 60%),
-        radial-gradient(52% 44% at 88% 10%, #00c6ff 0%, transparent 62%),
-        radial-gradient(58% 54% at 80% 94%, #ff5ea8 0%, transparent 60%),
-        radial-gradient(48% 44% at 6% 90%, #00e0b8 0%, transparent 62%),
-        #07070c;
-      background-attachment: fixed;
-      background-repeat: no-repeat;
+    /* --- Neumorphism fixes ----------------------------------------------
+       The base skin replaced borders with a transparent 0px rim, but several
+       components still had hard geometric borders/shadows in the original
+       rule set. Bring those stragglers back onto the soft token system. */
+    [data-style="neumorph"] .card h2,
+    [data-style="neumorph"] .test-block,
+    [data-style="neumorph"] .panel-group,
+    [data-style="neumorph"] .panel-foot {
+      border-color: var(--ui-rim);
+      border-style: solid;
     }
-    html[data-style="liquid"] body {
-      background-color: transparent;
-      background-image: none;
-      --ui-radius: 28px;
-      --ui-radius-sm: 16px;
-      --ui-pill: 999px;
-      --ui-border-w: 1px;
-      --ui-border-style: solid;
-      --ui-rim: rgb(255 255 255 / 0.30);
-      --ui-surface: rgb(20 20 28 / 0.42);
-      --ui-subsurface: rgb(255 255 255 / 0.10);
-      --ui-backdrop: blur(34px) saturate(1.9);
-      --ui-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.55),
-        inset 0 -1px 1px rgb(0 0 0 / 0.35),
-        0 26px 60px -30px rgb(0 0 0 / 0.75);
-      --ui-shadow-sm:
-        inset 0 1px 0 rgb(255 255 255 / 0.60),
-        inset 0 -1px 1px rgb(0 0 0 / 0.25),
-        0 10px 24px -16px rgb(0 0 0 / 0.7);
-      --ui-sheen: linear-gradient(155deg, rgb(255 255 255 / 0.30), rgb(255 255 255 / 0.05) 34%, transparent 60%);
-      --ui-font: -apple-system, "SF Pro Text", BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
-      --ui-text-shadow: none;
+    [data-style="neumorph"] .placeholder-text,
+    [data-style="neumorph"] .zoom-controls,
+    [data-style="neumorph"] .box-label,
+    [data-style="neumorph"] .resize-handle,
+    [data-style="neumorph"] #alarm-banner {
+      border-color: var(--ui-rim);
+      border-width: 1px;
+      border-style: solid;
+      box-shadow: var(--ui-shadow-sm);
+      text-shadow: none;
     }
-    html[data-style="liquid"] .card:hover,
-    html[data-style="liquid"] .zone-card:hover { transform: none; }
-    html[data-style="liquid"] .card h2 {
-      border-bottom-style: solid;
-      border-bottom-color: rgb(255 255 255 / 0.18);
+    [data-style="neumorph"] .video-container { border-color: var(--ui-rim); }
+    [data-style="neumorph"] .crop-box:not(.pixel-mode) { box-shadow: var(--ui-shadow-sm); }
+    [data-style="neumorph"] .btn:hover,
+    [data-style="neumorph"] .btn:active,
+    [data-style="neumorph"] .btn:disabled,
+    [data-style="neumorph"] .stop-alarm-btn,
+    [data-style="neumorph"] .stop-alarm-btn:hover,
+    [data-style="neumorph"] .stop-alarm-btn:active,
+    [data-style="neumorph"] .zoom-btn,
+    [data-style="neumorph"] .step-btn,
+    [data-style="neumorph"] .header-btn:hover {
+      box-shadow: var(--ui-shadow-sm);
+      border-color: var(--ui-rim);
     }
-    html[data-style="liquid"] header {
-      background-color: rgb(12 12 18 / 0.36);
-      border-bottom-color: rgb(255 255 255 / 0.22);
+    [data-style="neumorph"] .stop-alarm-btn {
+      background: var(--button-bg); color: var(--button-text);
     }
-    html[data-style="liquid"] .video-container {
-      background-color: rgb(10 10 16 / 0.30);
-      background-image: linear-gradient(160deg, rgb(255 255 255 / 0.10), transparent 55%);
+    [data-style="neumorph"] .health-dot { box-shadow: 0 0 0 1px var(--ui-rim); }
+    [data-style="neumorph"] .theme-panel,
+    [data-style="neumorph"] .modal-content {
+      background-color: color-mix(in srgb, var(--bg-color) 86%, var(--headline-color) 14%);
     }
-    html[data-style="liquid"] .btn,
-    html[data-style="liquid"] .header-btn,
-    html[data-style="liquid"] .style-chip,
-    html[data-style="liquid"] .panel-btn,
-    html[data-style="liquid"] .zoom-btn,
-    html[data-style="liquid"] .step-btn,
-    html[data-style="liquid"] .toggle-btn,
-    html[data-style="liquid"] .stop-alarm-btn {
-      border-radius: 999px;
-      border-color: rgb(255 255 255 / 0.28);
-      box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.55),
-        0 8px 20px -12px rgb(0 0 0 / 0.65);
-      transition: transform .18s cubic-bezier(.2, .8, .2, 1), background-color .18s ease, box-shadow .18s ease;
+
+    /* --- next-step coach mark -------------------------------------------
+       State/labels stay in the DOM (never CSS content) so screen readers and
+       the live language toggle see the same guidance as sighted users. */
+    .next-step {
+      position: absolute; left: 50%; bottom: 16px;
+      transform: translateX(-50%);
+      z-index: 35;
+      display: none; align-items: center; gap: 9px;
+      max-width: min(92%, 540px);
+      padding: 8px 11px;
+      border: var(--ui-border-w, 2px) solid var(--ui-rim, var(--stroke-color));
+      border-radius: var(--ui-radius-sm, 8px);
+      background: var(--ui-surface, var(--main-color));
+      box-shadow: var(--ui-shadow-sm, 2px 2px 0 var(--stroke-color));
+      color: var(--headline-color);
+      font-size: 0.76rem; font-weight: 700; line-height: 1.45;
+      text-align: left;
     }
-    html[data-style="liquid"] .btn:hover,
-    html[data-style="liquid"] .header-btn:hover,
-    html[data-style="liquid"] .zoom-btn:hover,
-    html[data-style="liquid"] .step-btn:hover,
-    html[data-style="liquid"] .toggle-btn:hover { transform: translateY(-1px); }
-    html[data-style="liquid"] .btn-primary {
-      background-color: color-mix(in srgb, var(--button-bg) 78%, white 22%);
-      color: #0a0a0f;
+    .next-step[hidden] { display: none; }
+    .next-step[data-visible="true"] { display: flex; }
+    .next-step-count {
+      flex: none; display: inline-flex; align-items: center; justify-content: center;
+      min-width: 26px; height: 24px; padding: 0 5px;
+      border-radius: var(--ui-pill, 999px);
+      background: var(--button-bg); color: var(--button-text);
+      font-size: 0.66rem; font-weight: 900; font-variant-numeric: tabular-nums;
     }
-    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-      html[data-style="liquid"] body {
-        --ui-surface: rgb(18 18 26 / 0.94);
-        --ui-subsurface: rgb(38 38 50 / 0.94);
-      }
+    .next-step-text { flex: 1; min-width: 0; text-shadow: none; }
+    .next-step-close {
+      flex: none; border: 0; box-shadow: none; background: none;
+      color: var(--paragraph-color); cursor: pointer;
+      font-size: 0.95rem; line-height: 1; padding: 2px 4px;
     }
-    @media (prefers-reduced-transparency: reduce) {
-      /* Keep the colored backdrop, drop only the blur + see-through surfaces. */
-      html[data-style="liquid"] body {
-        --ui-surface: rgb(18 18 26 / 0.97);
-        --ui-subsurface: rgb(38 38 50 / 0.97);
-        --ui-backdrop: none;
-      }
-    }
+    .next-step-close:hover { color: var(--headline-color); }
     @media (max-width: 900px) {
       .header-right { width: 100%; justify-content: flex-end; }
       .theme-panel { left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 72dvh; }
@@ -2042,7 +1998,7 @@
   <header>
     <div class="header-left">
       <h1><span class="nb-icon-box" aria-hidden="true">MON</span> <span data-i18n="app.title">多區域色彩監控器</span></h1>
-      <button type="button" class="version-tag" id="version-history-btn" aria-haspopup="dialog" aria-label="v2.9.3 版本歷史" data-i18n-aria="version.open">v2.9.3</button>
+      <button type="button" class="version-tag" id="version-history-btn" aria-haspopup="dialog" aria-label="v2.9.4 版本歷史" data-i18n-aria="version.open">v2.9.4</button>
     </div>
     <div class="header-right">
       <span id="system-status" class="status-badge badge-off" role="status" aria-live="polite">待機中</span>
@@ -2094,8 +2050,6 @@
       <span class="panel-label" data-i18n="panel.style">設計風格</span>
       <div class="chips" id="styleChips" role="group" aria-label="切換設計風格" data-i18n-aria="panel.styleAria">
         <button class="style-chip" type="button" data-skin="original" aria-pressed="true"><span class="chip-dot" style="--sw:#7f5af0"></span><span data-i18n="style.original">原版</span></button>
-        <button class="style-chip" type="button" data-skin="glass"><span class="chip-dot" style="--sw:#74b9ff"></span><span data-i18n="style.glass">玻璃</span></button>
-        <button class="style-chip" type="button" data-skin="liquid"><span class="chip-dot" style="--sw:#0a84ff"></span><span data-i18n="style.liquid">液態玻璃</span></button>
         <button class="style-chip" type="button" data-skin="neumorph"><span class="chip-dot" style="--sw:#6366f1"></span><span data-i18n="style.neumorph">新擬態</span></button>
         <button class="style-chip" type="button" data-skin="brutal"><span class="chip-dot" style="--sw:#facc15"></span><span data-i18n="style.brutal">野獸派</span></button>
         <button class="style-chip" type="button" data-skin="neubrutal"><span class="chip-dot" style="--sw:#010101"></span><span data-i18n="style.neubrutal">暗黑粗獷</span></button>
@@ -2149,7 +2103,7 @@
 
   <dialog id="info-modal" class="modal-overlay" aria-labelledby="info-modal-title" closedby="any">
     <div class="modal-content">
-      <h1 id="info-modal-title"><span class="nb-icon-box" style="margin-right:6px;" aria-hidden="true">GUIDE</span> <span data-i18n="guide.title">v2.9.3 使用方法與功能指南</span></h1>
+      <h1 id="info-modal-title"><span class="nb-icon-box" style="margin-right:6px;" aria-hidden="true">GUIDE</span> <span data-i18n="guide.title">v2.9.4 使用方法與功能指南</span></h1>
 
       <h2 data-i18n="guide.s1">1. 開始監控畫面</h2>
       <ul>
@@ -2179,7 +2133,7 @@
 
       <h2 data-i18n="guide.s5">5. 外觀風格與已儲存外觀 (Style Kit)</h2>
       <ul>
-        <li data-i18n="guide.s5a">右上角 ⚙ 外觀面板可切換 10 種設計風格（含液態玻璃）、配色主題與背景印花。</li>
+        <li data-i18n="guide.s5a">右上角 ⚙ 外觀面板可切換 8 種設計風格、配色主題與背景印花。</li>
         <li data-i18n="guide.s5b">可為目前外觀命名儲存、一鍵套用或刪除，並匯出 / 匯入 JSON 設定檔。</li>
         <li data-i18n="guide.s5c">外觀使用獨立的 LocalStorage 鍵，不會影響監控設定與區域座標。</li>
       </ul>
@@ -2187,7 +2141,16 @@
       <h2 id="version-history" tabindex="-1" data-i18n="guide.history">版本歷史</h2>
       <div class="version-history">
         <section class="version-entry">
-          <h3><span>v2.9.3</span><span class="version-date">2026-11-25</span><span class="version-latest" data-i18n="history.latest">最新</span></h3>
+          <h3><span>v2.9.4</span><span class="version-date">2026-11-25</span><span class="version-latest" data-i18n="history.latest">最新</span></h3>
+          <ul>
+            <li data-i18n="history.v294a">等到新的影像影格才取樣，修正第一次取得的顏色可能不正確。</li>
+            <li data-i18n="history.v294b">加入三步驟引導提示，清楚告知開始分享、放置探針與調整監控。</li>
+            <li data-i18n="history.v294c">移除 Glass 與 Liquid Glass 外觀；舊設定會自動回到原版。</li>
+            <li data-i18n="history.v294d">修正 Neumorphism 的邊界、陰影與警示列樣式不一致問題。</li>
+          </ul>
+        </section>
+        <section class="version-entry">
+          <h3><span>v2.9.3</span><span class="version-date">2026-11-25</span></h3>
           <ul>
             <li data-i18n="history.v293a">修正中間「開始分享監控畫面」被影片層覆蓋而無法點擊。</li>
             <li data-i18n="history.v293b">新增自我測試與長時間監控健康狀態（最後取樣、停頓偵測、心跳紀錄）。</li>
@@ -2279,6 +2242,12 @@
             <div class="resize-handle handle-se"></div>
           </div>
         </div>
+      </div>
+
+      <div id="next-step" class="next-step" role="status" aria-live="polite" hidden data-visible="false">
+        <span id="next-step-count" class="next-step-count">1/3</span>
+        <span id="next-step-text" class="next-step-text" data-i18n="next.idle">步驟 1/3：點「開始分享監控畫面」，選擇要監控的視窗。</span>
+        <button id="next-step-close" class="next-step-close" type="button" aria-label="關閉提示" data-i18n-aria="next.dismiss">✕</button>
       </div>
     </div>
 
@@ -2441,7 +2410,7 @@
         'header.settings': 'Looks',
         'header.settingsAria': 'Looks settings',
         'header.help': 'Help',
-        'version.open': 'v2.9.3 version history',
+        'version.open': 'v2.9.4 version history',
 
         'health.waiting': 'No samples yet',
 
@@ -2481,8 +2450,6 @@
         'panel.styleAria': 'Switch design style',
         'panel.aria': 'Appearance and storage settings',
         'style.original': 'Original',
-        'style.glass': 'Glass',
-        'style.liquid': 'Liquid Glass',
         'style.neumorph': 'Neumorphism',
         'style.brutal': 'Brutalism',
         'style.neubrutal': 'Dark brutalism',
@@ -2502,7 +2469,7 @@
         'panel.foot': 'Stored separately · monitor settings untouched',
         'panel.reset': 'Reset',
 
-        'guide.title': 'v2.9.3 user guide',
+        'guide.title': 'v2.9.4 user guide',
         'guide.s1': '1. Start monitoring',
         'guide.s1a': 'Click “Start screen share” in the control panel.',
         'guide.s1b': 'In the browser picker, choose the tab, window or screen to watch (a window showing the status display works best).',
@@ -2518,11 +2485,15 @@
         'guide.s4': '4. Automatic memory (localStorage)',
         'guide.s4a': 'Palette, pattern, detection mode, interval, sensitivity, schedule, zone positions and on/off states are saved automatically and restored on reload.',
         'guide.s5': '5. Looks and saved presets',
-        'guide.s5a': 'The ⚙ Looks panel switches all 10 styles (including Liquid Glass), the color theme and the background pattern.',
+        'guide.s5a': 'The ⚙ Looks panel switches all 8 styles, the color theme and the background pattern.',
         'guide.s5b': 'Name and save a look, apply or delete it, or export / import looks as JSON.',
         'guide.s5c': 'Looks use their own storage keys and never change the monitoring settings or zone positions.',
         'guide.history': 'Version history',
         'history.latest': 'Latest',
+        'history.v294a': 'Wait for a fresh decoded frame before sampling, fixing incorrect colors on the first sample.',
+        'history.v294b': 'Added a three-step coach mark for starting, placing probes and tuning the monitor.',
+        'history.v294c': 'Removed the Glass and Liquid Glass styles; saved looks using them fall back to Original.',
+        'history.v294d': 'Fixed inconsistent borders, shadows and alarm styling in Neumorphism.',
         'history.v293a': 'Fixed the centered “Start screen share” button being covered by the video layer.',
         'history.v293b': 'Added a self-test and long-run health status (last sample, stall detection, heartbeat log).',
         'history.v293c': 'Precision point now uses an independent coordinate, so all four screen corners are reachable.',
@@ -2542,6 +2513,12 @@
         'video.placeholder': 'Click “Start screen share” on the right to begin.',
         'stage.title': 'Monitoring not started',
         'stage.hint': 'Pick the tab or window to watch, and three zone boxes appear over it.',
+
+        'next.idle': 'Step 1/3 — Click “Start screen share”, then choose the tab or window to watch.',
+        'next.place': 'Step 2/3 — Drag a dashed probe onto the target pixel; moving it rebuilds that zone baseline.',
+        'next.live': 'Step 3/3 — Live: tune sensitivity, pause a zone, or test the alarm any time.',
+        'next.alarm': 'Alarm active — press “Dismiss alarm” to stop it.',
+        'next.dismiss': 'Dismiss this hint',
 
         'zone.1': 'Zone 1',
         'zone.2': 'Zone 2',
@@ -2854,6 +2831,10 @@
     const selfTestBtn = document.getElementById('self-test-btn');
     const selfTestStatus = document.getElementById('self-test-status');
     const selfTestResults = document.getElementById('self-test-results');
+    const nextStep = document.getElementById('next-step');
+    const nextStepCount = document.getElementById('next-step-count');
+    const nextStepText = document.getElementById('next-step-text');
+    const nextStepClose = document.getElementById('next-step-close');
 
     let lastSampleAt = 0;
     let monitorStartedAt = 0;
@@ -2869,6 +2850,11 @@
     // are meaningless. Reset them and ignore alarm thresholds for a short grace
     // period while the new baseline settles.
     let rebaselineUntil = 0;
+
+    // A freshly acquired track can report readyState >= 2 before it has decoded
+    // a real frame. Sampling then reads a stale/black canvas, which is why the
+    // very first color was sometimes wrong. Wait for two real frame callbacks.
+    let framesUntilFirstSample = 0;
 
     function resetBaselinesForMode() {
       zones.forEach(z => { z.baseline = null; });
@@ -2986,6 +2972,47 @@
       requestAnimationFrame(() => { srAlerts.textContent = message; });
     }
 
+    /* --- next-step guidance ---------------------------------------------
+       A compact, dismissible coach mark advances with the real state. Text is
+       written into the DOM (not CSS content) so it is translatable and is
+       announced once per change through role="status" / aria-live="polite". */
+    const NEXT_STEPS = {
+      idle:  { count: '1/3', key: 'next.idle',
+               zh: '步驟 1/3：點「開始分享監控畫面」，選擇要監控的視窗。' },
+      place: { count: '2/3', key: 'next.place',
+               zh: '步驟 2/3：拖曳虛線探針到目標像素；移動後會自動重設基準。' },
+      live:  { count: '3/3', key: 'next.live',
+               zh: '步驟 3/3：監控中，可調整靈敏度、暫停區域或測試警報。' },
+      alarm: { count: '!',   key: 'next.alarm',
+               zh: '警報響起中，請按「解除警報」停止。' },
+    };
+    let nextStepKey = null;
+    let nextStepDismissed = false;
+
+    function setNextStep(state) {
+      if (!nextStep || !nextStepText || !nextStepCount) return;
+      if (state === 'off' || nextStepDismissed) {
+        nextStep.hidden = true;
+        nextStep.dataset.visible = 'false';
+        nextStepKey = null;
+        return;
+      }
+      const item = NEXT_STEPS[state];
+      if (!item) return;
+      nextStepKey = state;
+      nextStepCount.textContent = item.count;
+      nextStepText.textContent = window.t(item.zh, window.tKey(item.key, item.zh));
+      nextStep.hidden = false;
+      nextStep.dataset.visible = 'true';
+    }
+
+    if (nextStepClose) {
+      nextStepClose.addEventListener('click', () => {
+        nextStepDismissed = true;
+        setNextStep('off');
+      });
+    }
+
     function applyTransform() {
       zoomStage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomScale})`;
       zoomLevelEl.textContent = zoomScale.toFixed(1) + 'x';
@@ -3044,6 +3071,7 @@
         ? t('[TEST] 測試警報音效中…按「解除警報」停止', '[TEST] Alarm test running… press “Dismiss alarm” to stop')
         : t('[ALERT] 偵測到 狀態顏色變更！警報響起中...', '[ALERT] Color change detected — alarm active…');
       alarmBanner.style.display = 'flex';
+      setNextStep('alarm');
       announce(alarmBannerText.textContent);
 
       const playBeep = () => {
@@ -3082,7 +3110,10 @@
         alarmTimer = null;
       }
       alarmBanner.style.display = 'none';
-      if (fromUser) log(t('使用者已暫停警報音效', 'Alarm dismissed by user'));
+      if (fromUser) {
+        log(t('使用者已暫停警報音效', 'Alarm dismissed by user'));
+        if (stream) setNextStep('live');
+      }
     }
 
     soundTestBtn.addEventListener('click', () => {
@@ -3246,6 +3277,21 @@
       });
     });
 
+    function armFirstFrames() {
+      framesUntilFirstSample = 2;
+      const useVideoCallback = typeof video.requestVideoFrameCallback === 'function';
+      const step = () => {
+        if (!stream) return;
+        framesUntilFirstSample = Math.max(0, framesUntilFirstSample - 1);
+        if (framesUntilFirstSample > 0) {
+          if (useVideoCallback) video.requestVideoFrameCallback(step);
+          else requestAnimationFrame(step);
+        }
+      };
+      if (useVideoCallback) video.requestVideoFrameCallback(step);
+      else requestAnimationFrame(step);
+    }
+
     async function startCapture() {
       if (stream) return;
       stream = await navigator.mediaDevices.getDisplayMedia({ video: { cursor: "always" }, audio: false });
@@ -3254,15 +3300,27 @@
       videoWrapper.classList.remove('is-idle');
       if (stageError) stageError.hidden = true;
       startBtn.classList.remove('needs-attention');
+      nextStepDismissed = false;
+      setNextStep('place');
 
-      video.onloadedmetadata = () => {
+      let readyHandled = false;
+      const handleVideoReady = () => {
+        if (readyHandled) return;
+        readyHandled = true;
         updateStageSize();
         zones.forEach(z => {
-          document.getElementById(`crop-box-${z.id}`).style.display = 'block';
+          const box = document.getElementById(`crop-box-${z.id}`);
+          if (box) box.style.display = 'block';
           z.baseline = null;
           updateBoxDOM(z);
         });
+        armFirstFrames();
       };
+      video.onloadedmetadata = handleVideoReady;
+      // Metadata can already be present when the handler is attached. Without
+      // this check the stage keeps its default size and the first pixel sample
+      // is taken from the wrong coordinate.
+      if (video.readyState >= 1) handleVideoReady();
 
       monitorStartedAt = Date.now();
       lastHeartbeatAt = monitorStartedAt;
@@ -3609,6 +3667,9 @@
         stopBtn.disabled = true;
         monitorStartedAt = 0;
         lastSampleAt = 0;
+        framesUntilFirstSample = 0;
+        nextStepDismissed = false;
+        setNextStep('idle');
         updateHealth();
         if (wasActive) log(t('監控已結束', 'Monitoring stopped'));
       } finally {
@@ -3632,6 +3693,9 @@
 
     function checkColors() {
       if (!video.videoWidth || !video.videoHeight || video.readyState < 2) return;
+      // Let the new track settle: readyState alone can be true while the
+      // canvas still holds the previous (or a blank) decoded frame.
+      if (framesUntilFirstSample > 0) return;
 
       // Resize only when the captured resolution changes: assigning width or
       // height reallocates the backing store and is expensive every tick.
@@ -3649,6 +3713,13 @@
       lastSampleAt = Date.now();
       sampleCount += 1;
       stallLogged = false;
+
+      // The baseline must come from a settled frame, not from a stale value
+      // left over from the previous capture or from the picker transition.
+      if (sampleCount === 1) {
+        zones.forEach(z => { z.baseline = null; });
+        setNextStep('live');
+      }
 
       if (monitorStartedAt && lastSampleAt - lastHeartbeatAt >= 10 * 60 * 1000) {
         lastHeartbeatAt = lastSampleAt;
@@ -3954,9 +4025,11 @@
         alarmBannerText.textContent = t('[ALERT] 偵測到 狀態顏色變更！警報響起中...',
           '[ALERT] Color change detected — alarm active…');
       }
+      if (nextStepKey && !nextStepDismissed) setNextStep(nextStepKey);
     }
 
     refreshLanguageDependentText();
+    setNextStep('idle');
     window.addEventListener('langchange', refreshLanguageDependentText);
   </script>
 
@@ -3971,8 +4044,6 @@
     const P = 'job-monitor-v282-stylekit';
     const STYLES = {
       original:  '原版 (Original)',
-      glass:     '玻璃 (Glass)',
-      liquid:    '液態玻璃 (Liquid Glass)',
       neumorph:  '新擬態 (Neumorphism)',
       brutal:    '野獸派 (Brutalism)',
       neubrutal: '暗黑粗獷 (Dark Neubrutalism)',

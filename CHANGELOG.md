@@ -1,6 +1,19 @@
 # Changelog
 
-本 repo 只包含最新版 v2.9.3；舊版本未納入上傳內容。
+This repo contains only the latest version, v2.9.4. Older versions are not included.
+
+## v2.9.4 — 2026-11-25
+
+### Added
+- Three-step coach mark (start → place probe → live/alarm) with live bilingual text and a dismiss button.
+
+### Changed
+- Reduced the style kit from 10 to 8 looks; Glass and Liquid Glass were removed and saved looks using them fall back to Original.
+
+### Fixed
+- First sample now waits for two fresh decoded video frames and rebuilds the baseline from that settled frame, fixing incorrect initial colors.
+- Handled the case where video metadata is already ready before the handler is attached, so the stage size is correct on the first sample.
+- Neumorphism: restored visible boundaries on cards, inputs, health status, separators, alarm banner and buttons, replacing leftover hard geometric borders/shadows with soft tokens.
 
 ## v2.9.3 — 2026-11-25
 

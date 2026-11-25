@@ -5,7 +5,7 @@
 
 Watch 1–3 screen areas in real time using browser screen sharing. Set sensitivity thresholds, trigger alarm sound/banners, schedule monitoring, and switch visual themes. Everything is in a single HTML file — no backend, no dependencies, no build step.
 
-> This repo contains only the latest version, **v2.9.3**. Older versions are not included.
+> This repo contains only the latest version, **v2.9.4**. Older versions are not included.
 
 - **Live demo:** <https://jl7121021.github.io/color-monitor/>
 - **Source code:** <https://github.com/JL7121021/color-monitor>
@@ -19,7 +19,9 @@ Watch 1–3 screen areas in real time using browser screen sharing. Set sensitiv
 - Alarm sound and banner (must be cleared with **Dismiss alarm**)
 - Start/stop scheduling (browser policy still requires one manual click when a schedule fires)
 - Traditional Chinese / English switching at runtime
-- 10 visual themes including Liquid Glass, with saved/exportable/importable styles
+- 8 visual themes (including Neumorphism), with saved/exportable/importable styles
+- Three-step on-screen coach mark that advances with the actual state (start → place probe → live/alarm), dismissible and bilingual
+- First sample waits for two fresh decoded video frames, so the initial color and baseline are correct
 - Built-in self-test: five checks with no alarm side effects
 - Long-running health monitoring: last sample age, stall watchdog, 10-minute heartbeat log, and automatic resync when the tab becomes visible
 - In-app version history (click the version tag in the header)
@@ -55,7 +57,7 @@ All settings, themes, and zone coordinates are stored only in your own browser's
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | Full application, v2.9.3 |
+| `index.html` | Full application, v2.9.4 |
 | `CHANGELOG.md` | Change history |
 | `LICENSE` | MIT license |
 | `.gitignore` | Git ignore rules |
