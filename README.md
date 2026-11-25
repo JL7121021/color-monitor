@@ -10,6 +10,8 @@ Watch 1–3 screen areas in real time using browser screen sharing. Set sensitiv
 - **Live demo:** <https://jl7121021.github.io/color-monitor/>
 - **Source code:** <https://github.com/JL7121021/color-monitor>
 
+<img width="1848" height="1305" alt="image" src="https://github.com/user-attachments/assets/3acd34f3-2295-4d4a-bb29-1b50e2c01f4a" />
+
 ## Features
 
 - Up to three independently monitored zones, each pausable
