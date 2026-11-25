@@ -1,6 +1,18 @@
 # Changelog
 
-This repo contains only the latest version, v2.9.4. Older versions are not included.
+This repo contains only the latest version, v2.9.5. Older versions are not included.
+
+## v2.9.5 — 2026-11-25
+
+### Added
+- Day / Night switch in the Looks panel; it works for all 8 styles, is remembered with saved looks, and restores before first paint.
+
+### Changed
+- Rebuilt Neumorphism from the reference designs: light-grey raised surfaces on a white page, transparent rims, paired light/dark shadows, recessed inputs and inset pressed feedback. Night uses a dark page with slate surfaces and softened shadows.
+- Terminal is now a true phosphor CRT look with square corners, scanlines, a blinking cursor and prompt prefixes. A pale phosphor Day variant is included.
+
+### Fixed
+- Neumorphism page and surface colors are no longer identical, so the right/bottom shadow reads correctly instead of looking flat or uneven.
 
 ## v2.9.4 — 2026-11-25
 

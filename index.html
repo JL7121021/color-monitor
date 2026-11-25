@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant-TW" data-lang="zh">
+<html lang="zh-Hant-TW" data-lang="zh" data-neu-mode="day">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,11 +17,13 @@
         var known = { original: 1, neumorph: 1, brutal: 1, neubrutal: 1,
                       clay: 1, editorial: 1, terminal: 1, aurora: 1 };
         if (s.style && known[s.style]) document.documentElement.setAttribute('data-style', s.style);
+        /* v2.9.5: restore Neumorphism Day / Night before first paint. */
+        if (s.neuMode === 'night') document.documentElement.setAttribute('data-neu-mode', 'night');
       } catch (e) { /* first visit / storage blocked */ }
     })();
   </script>
 
-  <title>多區域色彩監控器 v2.9.4 · Multi-Zone Color Monitor</title>
+  <title>多區域色彩監控器 v2.9.5 · Multi-Zone Color Monitor</title>
   <style>
     /* ==========================================================================
        Theme 1: 經典紫藍 (Default Dark Mode)
@@ -246,6 +248,44 @@
       --input-text: #fffffe;
       --log-bg: #0f0f13;
       --log-text: var(--custom-accent, #3498DB);
+      --danger-color: #ff5470;
+    }
+
+    /* ==========================================================================
+       Global Day / Night mode (v2.9.5)
+       Every style keeps its own geometry; this layer only swaps the base
+       surface palette. Accent colors still come from the selected data-theme.
+       ========================================================================== */
+    html[data-neu-mode="day"] { color-scheme: light; }
+    html[data-neu-mode="night"] { color-scheme: dark; }
+    [data-neu-mode="day"] body {
+      --bg-color: #f4f5f7;
+      --headline-color: #1f2430;
+      --paragraph-color: #5a6272;
+      --stroke-color: #c9ced8;
+      --main-color: #ffffff;
+      --secondary-color: #eceff4;
+      --subpanel-bg: #f7f8fa;
+      --subpanel-text: #232936;
+      --subpanel-muted: #626a78;
+      --input-bg: #ffffff;
+      --input-text: #232936;
+      --log-bg: #f1f3f6;
+      --danger-color: #c62828;
+    }
+    [data-neu-mode="night"] body {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --secondary-color: #2d2d38;
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
       --danger-color: #ff5470;
     }
     
@@ -1487,21 +1527,102 @@
     }
 
     /* --- 2. Neumorphism ------------------------------------------------ */
+    /* v2.9.5: rebuilt from the two reference designs. One light-grey surface,
+       no hard borders, paired white/dark shadows, and inset pressed states.
+       These palette variables override the dark data-theme values so *every*
+       component (including logs, selects and badges) follows the soft look. */
     [data-style="neumorph"] body {
-      --ui-radius: 22px; --ui-radius-sm: 14px; --ui-pill: 14px;
-      /* v2.9.4: a zero-width transparent rim made every separator, input and
-         status chip invisible. Keep a subtle solid boundary for legibility. */
-      --ui-border-w: 1px;
-      --ui-rim: color-mix(in srgb, var(--headline-color) 38%, var(--bg-color));
-      --ui-surface: var(--bg-color); --ui-subsurface: var(--bg-color);
+      /* Page is white like the reference; raised surfaces are #f1f1f1 so the
+         top-left highlight and right/bottom shadow read as a real bevel. */
+      --bg-color: #ffffff;
+      --headline-color: #3a3a3a;
+      --paragraph-color: #808080;
+      --button-bg: #f1f1f1;
+      --button-text: #6d6d6d;
+      --button-hover: #e9e9e9;
+      --stroke-color: rgb(255 255 255 / 0);
+      --main-color: #f1f1f1;
+      --highlight-color: #596b7a;
+      --secondary-color: #e8e8e8;
+      --tertiary-color: #6f9d8f;
+      --subpanel-bg: #f1f1f1;
+      --subpanel-text: #4a4a4a;
+      --subpanel-muted: #8a8a8a;
+      --input-bg: #f1f1f1;
+      --input-text: #4a4a4a;
+      --log-bg: #ececec;
+      --log-text: #5a6b5a;
+      --danger-color: #c05252;
+
+      --ui-radius: 20px;
+      --ui-radius-sm: 14px;
+      --ui-pill: 999px;
+      --ui-border-w: 2px;
+      --ui-border-style: solid;
+      --ui-rim: rgb(255 255 255 / 0);
+      --ui-surface: var(--main-color);
+      --ui-subsurface: var(--subpanel-bg);
       --ui-shadow:
-        10px 10px 24px rgb(0 0 0 / 0.6),
-        -10px -10px 24px rgb(255 255 255 / 0.06);
+        -8px -6px 15px var(--neu-light),
+        6px 8px 15px var(--neu-dark);
       --ui-shadow-sm:
-        4px 4px 10px rgb(0 0 0 / 0.55),
-        -4px -4px 10px rgb(255 255 255 / 0.06);
+        -4px -4px 9px var(--neu-light),
+        4px 4px 9px var(--neu-dark);
+      /* Highlight tokens are slightly softer than pure white so the lit edge
+         reads as a surface bevel instead of an overexposed halo. */
+      --neu-light: rgb(255 255 255 / 0.9);
+      --neu-dark: rgb(0 0 0 / 0.13);
+      --neu-dark-strong: rgb(0 0 0 / 0.17);
       --ui-sheen: none;
       --ui-text-shadow: none;
+      --ui-font: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+    }
+    [data-style="neumorph"] { color-scheme: light; }
+    [data-style="neumorph"] body[data-pattern="dots"] {
+      background-image: radial-gradient(rgb(0 0 0 / 0.08) 1.5px, transparent 1.5px);
+    }
+
+    /* Neumorphism Night: the same geometry with a muted slate surface. The
+       highlight is a low-opacity cool white, not a bright halo. */
+    [data-style="neumorph"][data-neu-mode="night"] { color-scheme: dark; }
+    [data-style="neumorph"][data-neu-mode="night"] body {
+      /* Night page stays darker than the raised slate surface for the same
+         reason: the right-side shadow needs a darker base to be visible. */
+      --bg-color: #0e0e14;
+      --headline-color: #e6e6ea;
+      --paragraph-color: #9a9aa5;
+      --button-bg: #1e1e24;
+      --button-text: #c9c9d1;
+      --button-hover: #25252d;
+      --stroke-color: rgb(0 0 0 / 0);
+      --main-color: #1e1e24;
+      --highlight-color: #8fa3b8;
+      --secondary-color: #2a2a33;
+      --tertiary-color: #7fb3a3;
+      --subpanel-bg: #1e1e24;
+      --subpanel-text: #d6d6dd;
+      --subpanel-muted: #9a9aa5;
+      --input-bg: #1e1e24;
+      --input-text: #d6d6dd;
+      --log-bg: #191920;
+      --log-text: #9fcfae;
+      --danger-color: #ff7a7a;
+
+      --ui-rim: rgb(0 0 0 / 0);
+      --ui-surface: var(--main-color);
+      --ui-subsurface: var(--subpanel-bg);
+      --ui-shadow:
+        -7px -7px 16px var(--neu-light),
+        8px 8px 18px var(--neu-dark);
+      --ui-shadow-sm:
+        -4px -4px 9px var(--neu-light),
+        4px 4px 10px var(--neu-dark);
+      --neu-light: rgb(255 255 255 / 0.08);
+      --neu-dark: rgb(0 0 0 / 0.45);
+      --neu-dark-strong: rgb(0 0 0 / 0.5);
+    }
+    [data-style="neumorph"][data-neu-mode="night"] body[data-pattern="dots"] {
+      background-image: radial-gradient(rgb(255 255 255 / 0.08) 1.5px, transparent 1.5px);
     }
 
     /* --- 3. Brutalism -------------------------------------------------- */
@@ -1554,15 +1675,109 @@
     }
 
     /* --- 7. Terminal --------------------------------------------------- */
+    /* v2.9.5: a real phosphor CRT terminal — black/green palette, hard square
+       edges, scanlines and a blinking block cursor. */
     [data-style="terminal"] body {
+      --bg-color: #050806;
+      --headline-color: #8dffab;
+      --paragraph-color: #6fbf84;
+      --button-bg: #07130a;
+      --button-text: #8dffab;
+      --button-hover: #0d2412;
+      --stroke-color: #173d22;
+      --main-color: #050806;
+      --highlight-color: #b9ff70;
+      --secondary-color: #0a1a0d;
+      --tertiary-color: #5ee7ff;
+      --subpanel-bg: #071109;
+      --subpanel-text: #8dffab;
+      --subpanel-muted: #6fbf84;
+      --input-bg: #020603;
+      --input-text: #8dffab;
+      --log-bg: #020603;
+      --log-text: #67ff8f;
+      --danger-color: #ff5f56;
+
       --ui-radius: 0px; --ui-radius-sm: 0px; --ui-pill: 0px;
-      --ui-border-w: 1px; --ui-border-style: dashed;
-      --ui-rim: color-mix(in srgb, var(--highlight-color) 65%, transparent);
-      --ui-shadow: none; --ui-shadow-sm: none;
-      --ui-font: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --ui-border-w: 1px; --ui-border-style: solid;
+      --ui-rim: color-mix(in srgb, var(--highlight-color) 42%, transparent);
+      --ui-surface: var(--bg-color);
+      --ui-subsurface: var(--subpanel-bg);
+      --ui-shadow: 0 0 0 1px color-mix(in srgb, var(--highlight-color) 12%, transparent), 0 0 22px rgb(60 255 110 / 0.10);
+      --ui-shadow-sm: inset 0 0 0 1px color-mix(in srgb, var(--highlight-color) 18%, transparent);
+      --ui-font: ui-monospace, SFMono-Regular, Menlo, Consolas, "Noto Sans TC", monospace;
       --ui-heading-transform: uppercase;
-      --ui-text-shadow: none;
+      --ui-text-shadow: 0 0 6px rgb(70 255 120 / 0.35);
+      background-image:
+        repeating-linear-gradient(180deg, rgb(0 0 0 / 0.32) 0 1px, transparent 1px 3px),
+        radial-gradient(80% 60% at 50% 0%, rgb(30 120 60 / 0.14), transparent 70%);
     }
+    [data-style="terminal"] { color-scheme: dark; }
+    [data-style="terminal"] body::before {
+      content: ""; position: fixed; inset: 0; z-index: 9000;
+      pointer-events: none;
+      background: repeating-linear-gradient(180deg, transparent 0 2px, rgb(0 0 0 / 0.16) 2px 4px);
+      mix-blend-mode: multiply;
+    }
+    @keyframes terminal-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+    [data-style="terminal"] header h1::after {
+      content: "▌"; margin-left: 6px;
+      color: var(--highlight-color);
+      animation: terminal-blink 1.1s steps(1) infinite;
+    }
+    [data-style="terminal"] .card h2::before {
+      content: "> "; color: var(--highlight-color); font-weight: 900;
+    }
+    [data-style="terminal"] .panel-name::before {
+      content: "$ "; color: var(--highlight-color);
+    }
+    [data-style="terminal"] input,
+    [data-style="terminal"] select,
+    [data-style="terminal"] textarea { caret-color: var(--highlight-color); }
+    [data-style="terminal"] :focus-visible {
+      outline: 2px solid var(--highlight-color); outline-offset: 1px;
+    }
+    [data-style="terminal"] .box-zone-1 { border-color: #39ff88; }
+    [data-style="terminal"] .box-zone-2 { border-color: #f1ff5a; }
+    [data-style="terminal"] .box-zone-3 { border-color: #5ee7ff; }
+
+    /* Terminal Day: a pale phosphor monitor — still unmistakably a terminal,
+       but with a light surface so the global Day / Night switch is visible. */
+    [data-style="terminal"][data-neu-mode="day"] { color-scheme: light; }
+    [data-style="terminal"][data-neu-mode="day"] body {
+      --bg-color: #eef7ef;
+      --headline-color: #0d3b1c;
+      --paragraph-color: #356b45;
+      --button-bg: #d7f0dc;
+      --button-text: #0d3b1c;
+      --button-hover: #c4e7cc;
+      --stroke-color: #b5d9bf;
+      --main-color: #f7fbf8;
+      --highlight-color: #1b7a3d;
+      --secondary-color: #e2f3e7;
+      --tertiary-color: #0f6f8c;
+      --subpanel-bg: #f1f8f2;
+      --subpanel-text: #0d3b1c;
+      --subpanel-muted: #356b45;
+      --input-bg: #ffffff;
+      --input-text: #0d3b1c;
+      --log-bg: #e6f4e9;
+      --log-text: #146c2e;
+      --danger-color: #b3261e;
+      --ui-rim: color-mix(in srgb, var(--highlight-color) 45%, transparent);
+      --ui-shadow: 0 0 0 1px color-mix(in srgb, var(--highlight-color) 18%, transparent), 0 6px 18px rgb(13 59 28 / 0.12);
+      --ui-shadow-sm: inset 0 0 0 1px color-mix(in srgb, var(--highlight-color) 22%, transparent);
+      --ui-text-shadow: none;
+      background-image:
+        repeating-linear-gradient(180deg, rgb(13 59 28 / 0.05) 0 1px, transparent 1px 3px),
+        radial-gradient(80% 60% at 50% 0%, rgb(27 122 61 / 0.08), transparent 70%);
+    }
+    [data-style="terminal"][data-neu-mode="day"] body::before {
+      background: repeating-linear-gradient(180deg, transparent 0 2px, rgb(13 59 28 / 0.06) 2px 4px);
+    }
+    [data-style="terminal"][data-neu-mode="day"] .box-zone-1 { border-color: #1b7a3d; }
+    [data-style="terminal"][data-neu-mode="day"] .box-zone-2 { border-color: #8a6d00; }
+    [data-style="terminal"][data-neu-mode="day"] .box-zone-3 { border-color: #0f6f8c; }
 
     /* --- 8. Aurora ---------------------------------------------------- */
     [data-style="aurora"] body {
@@ -1717,7 +1932,7 @@
     }
 
     /* =======================================================================
-       v2.9.4 — first-frame gating, next-step guide, 8 styles, Neumorphism fixes
+       v2.9.5 — first-frame gating, next-step guide, 8 styles, soft-UI Neumorphism
        ======================================================================= */
 
     /* --- one compact header; every appearance control moved to the panel -- */
@@ -1789,52 +2004,134 @@
     .panel-name { font-size: 0.78rem; font-weight: 800; }
     .panel-hint { margin-top: 6px; font-size: 0.68rem; line-height: 1.5; color: var(--paragraph-color); }
     #styleChips.chips { flex: none; flex-wrap: wrap; overflow: visible; }
+
+    /* Day / Night applies to every design style, not just Neumorphism. */
+    .neu-mode-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .neu-mode-switch {
+      display: inline-flex; gap: 3px; padding: 3px;
+      border-radius: 999px;
+      background: var(--ui-subsurface);
+      box-shadow: var(--ui-shadow-sm);
+    }
+    .neu-mode-btn {
+      border: 0; background: transparent; cursor: pointer;
+      padding: 5px 12px; border-radius: 999px;
+      color: var(--paragraph-color);
+      font-size: 0.7rem; font-weight: 800; line-height: 1.2;
+      text-shadow: none;
+    }
+    .neu-mode-btn[aria-pressed="true"] {
+      background: var(--button-bg); color: var(--button-text);
+      box-shadow: var(--ui-shadow-sm);
+    }
     .color-picker-row { display: flex; align-items: center; gap: 8px; }
 
-    /* --- Neumorphism fixes ----------------------------------------------
-       The base skin replaced borders with a transparent 0px rim, but several
-       components still had hard geometric borders/shadows in the original
-       rule set. Bring those stragglers back onto the soft token system. */
-    [data-style="neumorph"] .card h2,
+    /* --- Neumorphism: reference soft-UI details ---------------------------
+       Raised surfaces use the paired light/dark shadow; controls are recessed;
+       :active flips to inset shadows instead of adding a hard outline. */
+    [data-style="neumorph"] header,
+    [data-style="neumorph"] .card,
+    [data-style="neumorph"] .video-container,
+    [data-style="neumorph"] .modal-content,
+    [data-style="neumorph"] .theme-panel,
+    [data-style="neumorph"] .placeholder-text,
+    [data-style="neumorph"] .zone-card,
     [data-style="neumorph"] .test-block,
     [data-style="neumorph"] .panel-group,
-    [data-style="neumorph"] .panel-foot {
-      border-color: var(--ui-rim);
-      border-style: solid;
-    }
-    [data-style="neumorph"] .placeholder-text,
-    [data-style="neumorph"] .zoom-controls,
-    [data-style="neumorph"] .box-label,
-    [data-style="neumorph"] .resize-handle,
     [data-style="neumorph"] #alarm-banner {
       border-color: var(--ui-rim);
-      border-width: 1px;
-      border-style: solid;
+      box-shadow: var(--ui-shadow);
+    }
+    [data-style="neumorph"] .btn,
+    [data-style="neumorph"] .header-btn,
+    [data-style="neumorph"] .style-chip,
+    [data-style="neumorph"] .panel-btn,
+    [data-style="neumorph"] .zoom-btn,
+    [data-style="neumorph"] .step-btn,
+    [data-style="neumorph"] .toggle-btn,
+    [data-style="neumorph"] .stop-alarm-btn,
+    [data-style="neumorph"] .version-tag,
+    [data-style="neumorph"] .nb-icon-box,
+    [data-style="neumorph"] .nb-mini-tag,
+    [data-style="neumorph"] .status-badge,
+    [data-style="neumorph"] .zoom-controls,
+    [data-style="neumorph"] .box-label,
+    [data-style="neumorph"] .resize-handle {
+      border-color: var(--ui-rim);
       box-shadow: var(--ui-shadow-sm);
       text-shadow: none;
     }
-    [data-style="neumorph"] .video-container { border-color: var(--ui-rim); }
-    [data-style="neumorph"] .crop-box:not(.pixel-mode) { box-shadow: var(--ui-shadow-sm); }
-    [data-style="neumorph"] .btn:hover,
-    [data-style="neumorph"] .btn:active,
-    [data-style="neumorph"] .btn:disabled,
-    [data-style="neumorph"] .stop-alarm-btn,
-    [data-style="neumorph"] .stop-alarm-btn:hover,
-    [data-style="neumorph"] .stop-alarm-btn:active,
-    [data-style="neumorph"] .zoom-btn,
-    [data-style="neumorph"] .step-btn,
-    [data-style="neumorph"] .header-btn:hover {
-      box-shadow: var(--ui-shadow-sm);
+    /* Recessed tracks: inputs, selects and preset rows sit *into* the surface. */
+    [data-style="neumorph"] .theme-selector,
+    [data-style="neumorph"] .styled-input,
+    [data-style="neumorph"] .styled-select,
+    [data-style="neumorph"] .text-input,
+    [data-style="neumorph"] .panel-select,
+    [data-style="neumorph"] .preset,
+    [data-style="neumorph"] .schedule-panel {
       border-color: var(--ui-rim);
+      background-color: var(--bg-color);
+      box-shadow:
+        inset 4px 4px 9px var(--neu-dark),
+        inset -4px -4px 9px var(--neu-light);
     }
+    [data-style="neumorph"] .btn:hover,
+    [data-style="neumorph"] .header-btn:hover,
+    [data-style="neumorph"] .style-chip:hover,
+    [data-style="neumorph"] .panel-btn:hover,
+    [data-style="neumorph"] .zoom-btn:hover,
+    [data-style="neumorph"] .step-btn:hover,
+    [data-style="neumorph"] .toggle-btn:hover,
+    [data-style="neumorph"] .stop-alarm-btn:hover {
+      box-shadow:
+        -5px -5px 11px var(--neu-light),
+        5px 5px 11px var(--neu-dark-strong);
+      transform: none;
+    }
+    [data-style="neumorph"] .btn:active,
+    [data-style="neumorph"] .header-btn:active,
+    [data-style="neumorph"] .style-chip:active,
+    [data-style="neumorph"] .panel-btn:active,
+    [data-style="neumorph"] .zoom-btn:active,
+    [data-style="neumorph"] .step-btn:active,
+    [data-style="neumorph"] .toggle-btn:active,
+    [data-style="neumorph"] .stop-alarm-btn:active {
+      box-shadow:
+        inset 5px 5px 10px var(--neu-dark),
+        inset -5px -5px 10px var(--neu-light);
+      transform: none;
+    }
+    [data-style="neumorph"] .btn:disabled,
+    [data-style="neumorph"] .stop-alarm-btn:disabled { opacity: 0.55; }
     [data-style="neumorph"] .stop-alarm-btn {
       background: var(--button-bg); color: var(--button-text);
     }
-    [data-style="neumorph"] .health-dot { box-shadow: 0 0 0 1px var(--ui-rim); }
-    [data-style="neumorph"] .theme-panel,
-    [data-style="neumorph"] .modal-content {
-      background-color: color-mix(in srgb, var(--bg-color) 86%, var(--headline-color) 14%);
+    [data-style="neumorph"] .card h2,
+    [data-style="neumorph"] .test-block,
+    [data-style="neumorph"] .panel-group,
+    [data-style="neumorph"] .panel-foot,
+    [data-style="neumorph"] .health-row,
+    [data-style="neumorph"] #next-step {
+      border-color: var(--ui-rim);
+      box-shadow: none;
+      text-shadow: none;
     }
+    [data-style="neumorph"] .health-dot {
+      box-shadow: inset 1px 1px 2px var(--neu-dark);
+    }
+    [data-style="neumorph"] .crop-box:not(.pixel-mode) {
+      box-shadow:
+        6px 6px 14px var(--neu-dark),
+        -6px -6px 14px var(--neu-light);
+    }
+    /* Darker zone colors stay legible on the light soft-UI background. */
+    [data-style="neumorph"][data-neu-mode="day"] .box-zone-1 { border-color: #6c5ce7; }
+    [data-style="neumorph"][data-neu-mode="day"] .box-zone-2 { border-color: #b8860b; }
+    [data-style="neumorph"][data-neu-mode="day"] .box-zone-3 { border-color: #2a9d8f; }
+    /* Night uses lighter tints against the slate surface. */
+    [data-style="neumorph"][data-neu-mode="night"] .box-zone-1 { border-color: #b8a9ff; }
+    [data-style="neumorph"][data-neu-mode="night"] .box-zone-2 { border-color: #f1cf72; }
+    [data-style="neumorph"][data-neu-mode="night"] .box-zone-3 { border-color: #7fd7c8; }
 
     /* --- next-step coach mark -------------------------------------------
        State/labels stay in the DOM (never CSS content) so screen readers and
@@ -1998,7 +2295,7 @@
   <header>
     <div class="header-left">
       <h1><span class="nb-icon-box" aria-hidden="true">MON</span> <span data-i18n="app.title">多區域色彩監控器</span></h1>
-      <button type="button" class="version-tag" id="version-history-btn" aria-haspopup="dialog" aria-label="v2.9.4 版本歷史" data-i18n-aria="version.open">v2.9.4</button>
+      <button type="button" class="version-tag" id="version-history-btn" aria-haspopup="dialog" aria-label="v2.9.5 版本歷史" data-i18n-aria="version.open">v2.9.5</button>
     </div>
     <div class="header-right">
       <span id="system-status" class="status-badge badge-off" role="status" aria-live="polite">待機中</span>
@@ -2058,6 +2355,14 @@
         <button class="style-chip" type="button" data-skin="terminal"><span class="chip-dot" style="--sw:#22c55e"></span><span data-i18n="style.terminal">終端機</span></button>
         <button class="style-chip" type="button" data-skin="aurora"><span class="chip-dot" style="--sw:#8b5cf6"></span><span data-i18n="style.aurora">極光</span></button>
       </div>
+
+      <div class="neu-mode-row">
+        <span class="panel-label" data-i18n="panel.neuMode">明暗模式</span>
+        <div class="neu-mode-switch" role="group" data-i18n-aria="panel.neuModeAria" aria-label="所有風格的明暗模式">
+          <button class="neu-mode-btn" type="button" data-neu-mode="day" aria-pressed="true" data-i18n="panel.neuDay">白天</button>
+          <button class="neu-mode-btn" type="button" data-neu-mode="night" aria-pressed="false" data-i18n="panel.neuNight">夜晚</button>
+        </div>
+      </div>
     </div>
 
     <div class="panel-group">
@@ -2103,7 +2408,7 @@
 
   <dialog id="info-modal" class="modal-overlay" aria-labelledby="info-modal-title" closedby="any">
     <div class="modal-content">
-      <h1 id="info-modal-title"><span class="nb-icon-box" style="margin-right:6px;" aria-hidden="true">GUIDE</span> <span data-i18n="guide.title">v2.9.4 使用方法與功能指南</span></h1>
+      <h1 id="info-modal-title"><span class="nb-icon-box" style="margin-right:6px;" aria-hidden="true">GUIDE</span> <span data-i18n="guide.title">v2.9.5 使用方法與功能指南</span></h1>
 
       <h2 data-i18n="guide.s1">1. 開始監控畫面</h2>
       <ul>
@@ -2133,7 +2438,7 @@
 
       <h2 data-i18n="guide.s5">5. 外觀風格與已儲存外觀 (Style Kit)</h2>
       <ul>
-        <li data-i18n="guide.s5a">右上角 ⚙ 外觀面板可切換 8 種設計風格、配色主題與背景印花。</li>
+        <li data-i18n="guide.s5a">右上角 ⚙ 外觀面板可切換 8 種設計風格、配色主題、背景印花與 Day / Night 明暗模式。</li>
         <li data-i18n="guide.s5b">可為目前外觀命名儲存、一鍵套用或刪除，並匯出 / 匯入 JSON 設定檔。</li>
         <li data-i18n="guide.s5c">外觀使用獨立的 LocalStorage 鍵，不會影響監控設定與區域座標。</li>
       </ul>
@@ -2141,7 +2446,15 @@
       <h2 id="version-history" tabindex="-1" data-i18n="guide.history">版本歷史</h2>
       <div class="version-history">
         <section class="version-entry">
-          <h3><span>v2.9.4</span><span class="version-date">2026-11-25</span><span class="version-latest" data-i18n="history.latest">最新</span></h3>
+          <h3><span>v2.9.5</span><span class="version-date">2026-11-25</span><span class="version-latest" data-i18n="history.latest">最新</span></h3>
+          <ul>
+            <li data-i18n="history.v295a">Neumorphism 改為參考網站的淺灰軟 UI：無硬邊框、同色表面、雙層明暗陰影。</li>
+            <li data-i18n="history.v295b">輸入框改為內凹軌道，按鈕與開關加入按壓內凹回饋；外觀面板新增適用所有風格的 Day / Night 明暗切換。</li>
+            <li data-i18n="history.v295c">Terminal 改為真正的 CRT 終端機外觀；修正 Neumorphism 頁面底色與表面同色導致右側光影不明顯的問題。</li>
+          </ul>
+        </section>
+        <section class="version-entry">
+          <h3><span>v2.9.4</span><span class="version-date">2026-11-25</span></h3>
           <ul>
             <li data-i18n="history.v294a">等到新的影像影格才取樣，修正第一次取得的顏色可能不正確。</li>
             <li data-i18n="history.v294b">加入三步驟引導提示，清楚告知開始分享、放置探針與調整監控。</li>
@@ -2410,7 +2723,7 @@
         'header.settings': 'Looks',
         'header.settingsAria': 'Looks settings',
         'header.help': 'Help',
-        'version.open': 'v2.9.4 version history',
+        'version.open': 'v2.9.5 version history',
 
         'health.waiting': 'No samples yet',
 
@@ -2448,6 +2761,10 @@
         'pattern.none': '□ Plain',
         'panel.style': 'Design style',
         'panel.styleAria': 'Switch design style',
+        'panel.neuMode': 'Day / Night',
+        'panel.neuModeAria': 'Light and dark mode for all styles',
+        'panel.neuDay': 'Day',
+        'panel.neuNight': 'Night',
         'panel.aria': 'Appearance and storage settings',
         'style.original': 'Original',
         'style.neumorph': 'Neumorphism',
@@ -2469,7 +2786,7 @@
         'panel.foot': 'Stored separately · monitor settings untouched',
         'panel.reset': 'Reset',
 
-        'guide.title': 'v2.9.4 user guide',
+        'guide.title': 'v2.9.5 user guide',
         'guide.s1': '1. Start monitoring',
         'guide.s1a': 'Click “Start screen share” in the control panel.',
         'guide.s1b': 'In the browser picker, choose the tab, window or screen to watch (a window showing the status display works best).',
@@ -2485,11 +2802,14 @@
         'guide.s4': '4. Automatic memory (localStorage)',
         'guide.s4a': 'Palette, pattern, detection mode, interval, sensitivity, schedule, zone positions and on/off states are saved automatically and restored on reload.',
         'guide.s5': '5. Looks and saved presets',
-        'guide.s5a': 'The ⚙ Looks panel switches all 8 styles, the color theme and the background pattern.',
+        'guide.s5a': 'The ⚙ Looks panel switches all 8 styles, the color theme, the background pattern and Day / Night mode.',
         'guide.s5b': 'Name and save a look, apply or delete it, or export / import looks as JSON.',
         'guide.s5c': 'Looks use their own storage keys and never change the monitoring settings or zone positions.',
         'guide.history': 'Version history',
         'history.latest': 'Latest',
+        'history.v295a': 'Rebuilt Neumorphism from the reference sites: light grey soft UI, no hard borders, one surface color and paired light/dark shadows.',
+        'history.v295b': 'Inputs became recessed tracks, buttons/switches gained inset pressed feedback, and a Day / Night switch for every style was added to the Looks panel.',
+        'history.v295c': 'Terminal became a true CRT terminal look; Neumorphism page and surface colors were separated so the right-side shadow reads correctly.',
         'history.v294a': 'Wait for a fresh decoded frame before sampling, fixing incorrect colors on the first sample.',
         'history.v294b': 'Added a three-step coach mark for starting, placing probes and tuning the monitor.',
         'history.v294c': 'Removed the Glass and Liquid Glass styles; saved looks using them fall back to Original.',
@@ -4071,6 +4391,7 @@
       importFile: $('#importFile'),
       status: $('#storageStatus'),
       current: $('#currentStyleName'),
+      neuModeBtns: [...document.querySelectorAll('.neu-mode-btn[data-neu-mode]')],
       reset: $('#resetStyle'),
       colorPicker: $('#custom-color-picker'),
     };
@@ -4123,6 +4444,7 @@
       colorTheme: saved.colorTheme || null,
       pattern: saved.pattern || null,
       customColor: saved.customColor || null,
+      neuMode: saved.neuMode === 'night' ? 'night' : 'day',
     };
 
     /** The current look = style + the app's own palette/pattern/color. */
@@ -4132,6 +4454,7 @@
         colorTheme: body.getAttribute('data-theme') || 'purple-dark',
         pattern: body.getAttribute('data-pattern') || 'dots',
         customColor: els.colorPicker ? els.colorPicker.value : null,
+        neuMode: state.neuMode,
       };
     }
 
@@ -4154,8 +4477,12 @@
 
     function syncUI() {
       root.dataset.style = state.style;
+      root.dataset.neuMode = state.neuMode;
       els.chips.forEach((btn) =>
         btn.setAttribute('aria-pressed', String(btn.dataset.skin === state.style))
+      );
+      els.neuModeBtns.forEach((btn) =>
+        btn.setAttribute('aria-pressed', String(btn.dataset.neuMode === state.neuMode))
       );
       els.current.textContent = styleLabel(state.style);
       els.remember.checked = state.remember;
@@ -4171,6 +4498,14 @@
       state.style = id;
       apply();
       setStatus(t('已切換外觀：', 'Look: ') + styleLabel(id));
+    }
+
+    function setNeuMode(mode) {
+      if (mode !== 'day' && mode !== 'night') return;
+      state.neuMode = mode;
+      apply();
+      setStatus(t('新擬態模式：', 'Neumorphism: ') +
+        (mode === 'day' ? t('白天', 'Day') : t('夜晚', 'Night')));
     }
 
     /* ---------- status line ---------- */
@@ -4277,6 +4612,9 @@
     function applySettings(settings) {
       if (!settings || typeof settings !== 'object') return;
       if (STYLES[settings.style]) { state.style = settings.style; apply(); }
+      if (settings.neuMode === 'day' || settings.neuMode === 'night') {
+        state.neuMode = settings.neuMode;
+      }
       if (settings.colorTheme && typeof window.changeTheme === 'function') {
         window.changeTheme(settings.colorTheme);
         const themeSelect = document.getElementById('theme-selector');
@@ -4335,6 +4673,9 @@
     /* ---------- wiring ---------- */
     els.chips.forEach((btn) =>
       btn.addEventListener('click', () => setStyle(btn.dataset.skin))
+    );
+    els.neuModeBtns.forEach((btn) =>
+      btn.addEventListener('click', () => setNeuMode(btn.dataset.neuMode))
     );
     els.open.addEventListener('click', () => {
       const willOpen = els.panel.hidden;
