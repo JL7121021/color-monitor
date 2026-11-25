@@ -1,0 +1,14 @@
+# OS / editor junk
+Thumbs.db
+.DS_Store
+*.tmp
+*.log
+
+# Local tooling
+.vscode/
+.idea/
+preview/
+
+# Backup files
+*.bak
+*~

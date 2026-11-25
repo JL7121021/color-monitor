@@ -1,0 +1,4331 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" data-lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="text-scale" content="scale">
+  <meta name="description" content="多區域色彩監控器：以螢幕分享即時監控多個區域的顏色變化，支援靈敏度門檻、警報音、排程與外觀儲存。Multi-Zone Color Monitor watches several screen areas for color changes in real time.">
+
+  <!-- Style Kit: restore the saved skin BEFORE first paint (no flash). -->
+  <script>
+    (function () {
+      var P = 'job-monitor-v282-stylekit';
+      try {
+        if (localStorage.getItem(P + ':remember') === '0') return;
+        var s = JSON.parse(localStorage.getItem(P) || '{}') || {};
+        if (s.style) document.documentElement.setAttribute('data-style', s.style);
+      } catch (e) { /* first visit / storage blocked */ }
+    })();
+  </script>
+
+  <title>多區域色彩監控器 v2.9.3 · Multi-Zone Color Monitor</title>
+  <style>
+    /* ==========================================================================
+       Theme 1: 經典紫藍 (Default Dark Mode)
+       ========================================================================== */
+    [data-theme="purple-dark"] {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --button-bg: #7f5af0;
+      --button-text: #fffffe;
+      --button-hover: #6842c2;
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --highlight-color: #7f5af0;
+      --secondary-color: #2d2d38;
+      --tertiary-color: #2cb67d;
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
+      --log-text: #2cb67d;
+      --danger-color: #ff5470;
+    }
+
+    /* ==========================================================================
+       Theme 2: 醒目的黃色 (#FFD23F)
+       ========================================================================== */
+    [data-theme="bright-yellow"] {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --button-bg: #FFD23F;
+      --button-text: #16161a;
+      --button-hover: #e5bd32;
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --highlight-color: #FFD23F;
+      --secondary-color: #2d2d38;
+      --tertiary-color: #FFD23F;
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
+      --log-text: #FFD23F;
+      --danger-color: #ff5470;
+    }
+
+    /* ==========================================================================
+       Theme 3: 珊瑚粉 (#FF6B6B)
+       ========================================================================== */
+    [data-theme="coral-pink"] {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --button-bg: #FF6B6B;
+      --button-text: #fffffe;
+      --button-hover: #e05a5a;
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --highlight-color: #FF6B6B;
+      --secondary-color: #2d2d38;
+      --tertiary-color: #FF6B6B;
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
+      --log-text: #FF6B6B;
+      --danger-color: #ff5470;
+    }
+
+    /* ==========================================================================
+       Theme 4: 天藍色 (#74B9FF)
+       ========================================================================== */
+    [data-theme="sky-blue"] {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --button-bg: #74B9FF;
+      --button-text: #16161a;
+      --button-hover: #5fa5e8;
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --highlight-color: #74B9FF;
+      --secondary-color: #2d2d38;
+      --tertiary-color: #74B9FF;
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
+      --log-text: #74B9FF;
+      --danger-color: #ff5470;
+    }
+
+    /* ==========================================================================
+       Theme 5: 柔和的綠色 (#88D498)
+       ========================================================================== */
+    [data-theme="soft-green"] {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --button-bg: #88D498;
+      --button-text: #16161a;
+      --button-hover: #75bd85;
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --highlight-color: #88D498;
+      --secondary-color: #2d2d38;
+      --tertiary-color: #88D498;
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
+      --log-text: #88D498;
+      --danger-color: #ff5470;
+    }
+
+    /* ==========================================================================
+       Theme 6: 橘子 (#FFA552)
+       ========================================================================== */
+    [data-theme="vibrant-orange"] {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --button-bg: #FFA552;
+      --button-text: #16161a;
+      --button-hover: #e89341;
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --highlight-color: #FFA552;
+      --secondary-color: #2d2d38;
+      --tertiary-color: #FFA552;
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
+      --log-text: #FFA552;
+      --danger-color: #ff5470;
+    }
+
+    /* ==========================================================================
+       Theme 7: 薰衣草 (#B8A9FA)
+       ========================================================================== */
+    [data-theme="lavender"] {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --button-bg: #B8A9FA;
+      --button-text: #16161a;
+      --button-hover: #a392e8;
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --highlight-color: #B8A9FA;
+      --secondary-color: #2d2d38;
+      --tertiary-color: #B8A9FA;
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
+      --log-text: #B8A9FA;
+      --danger-color: #ff5470;
+    }
+
+
+    /* ==========================================================================
+       Theme 8: 灰色 (#7F8C8D)
+       ========================================================================== */
+    [data-theme="gray-theme"] {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --button-bg: #7F8C8D;
+      --button-text: #fffffe;
+      --button-hover: #6c7a7d;
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --highlight-color: #7F8C8D;
+      --secondary-color: #2d2d38;
+      --tertiary-color: #7F8C8D;
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
+      --log-text: #7F8C8D;
+      --danger-color: #ff5470;
+    }
+
+    /* ==========================================================================
+       Theme 9: 自定顏色 (Custom Accent)
+       ========================================================================== */
+    [data-theme="custom-theme"] {
+      --bg-color: #16161a;
+      --headline-color: #fffffe;
+      --paragraph-color: #94a1b2;
+      --button-bg: var(--custom-accent, #3498DB);
+      --button-text: #16161a;
+      --button-hover: var(--custom-accent-hover, #2980B9);
+      --stroke-color: #010101;
+      --main-color: #24242c;
+      --highlight-color: var(--custom-accent, #3498DB);
+      --secondary-color: #2d2d38;
+      --tertiary-color: var(--custom-accent, #3498DB);
+      --subpanel-bg: #1c1c24;
+      --subpanel-text: #fffffe;
+      --subpanel-muted: #94a1b2;
+      --input-bg: #16161a;
+      --input-text: #fffffe;
+      --log-bg: #0f0f13;
+      --log-text: var(--custom-accent, #3498DB);
+      --danger-color: #ff5470;
+    }
+    
+    /* ==========================================================================
+       Neubrutalism Ultimate UI Polish (v2.9.0)
+       ========================================================================== */
+    :root {
+      --geometric-shadow: 3px 3px 0px var(--stroke-color);
+      --card-shadow: 5px 5px 0px var(--stroke-color);
+      --hover-shadow: 6px 6px 0px var(--stroke-color);
+      --active-shadow: 2px 2px 0px var(--stroke-color);
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--headline-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      font-feature-settings: "tnum";
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      background-color: var(--main-color);
+      color: var(--headline-color);
+      padding: 14px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--stroke-color);
+      box-shadow: 0 4px 0 var(--stroke-color);
+      z-index: 50;
+    }
+
+    .card {
+      background: var(--main-color);
+      color: var(--headline-color);
+      border-radius: 12px;
+      padding: 18px;
+      border: 3px solid var(--stroke-color);
+      box-shadow: var(--card-shadow);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .card:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 11px 16px;
+      border: 3px solid var(--stroke-color);
+      border-radius: 9px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: var(--geometric-shadow);
+      text-shadow: none;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+    }
+    .btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px var(--stroke-color);
+    }
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: var(--active-shadow);
+    }
+
+    .theme-selector, .styled-input, .styled-select {
+      background: var(--input-bg);
+      color: var(--input-text);
+      border: 3px solid var(--stroke-color);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      outline: none;
+      box-shadow: var(--geometric-shadow);
+      cursor: pointer;
+      transition: border-color 0.15s, background-color 0.15s;
+    }
+    .theme-selector:hover, .styled-input:hover, .styled-select:hover {
+      border-color: var(--highlight-color);
+    }
+    .theme-selector:focus, .styled-input:focus, .styled-select:focus {
+      background: var(--subpanel-bg);
+      border-color: var(--highlight-color);
+    }
+
+    .zone-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 3px solid var(--stroke-color);
+      border-radius: 9px;
+      margin-bottom: 12px;
+      background: var(--subpanel-bg);
+      color: var(--subpanel-text);
+      box-shadow: 3px 3px 0px var(--stroke-color);
+      transition: transform 0.1s ease;
+    }
+    .zone-card:hover {
+      transform: translateX(2px);
+    }
+
+    .status-badge {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 900;
+      border: 2px solid var(--stroke-color);
+      box-shadow: 2px 2px 0px var(--stroke-color);
+      letter-spacing: 0.03em;
+    }
+
+    .schedule-panel {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 9px;
+      background: var(--subpanel-bg);
+      color: var(--subpanel-muted);
+      border: 3px solid var(--stroke-color);
+      font-size: 0.78rem;
+      box-shadow: 3px 3px 0px var(--stroke-color);
+    }
+
+    .log-box {
+      height: 120px;
+      background: var(--log-bg);
+      color: var(--log-text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 3px solid var(--stroke-color);
+      overflow-y: auto;
+      box-shadow: inset 3px 3px 0px rgba(1, 1, 1, 0.8);
+    }
+
+    :root {
+      --geometric-shadow: 3px 3px 0px var(--stroke-color);
+      --card-shadow: 4px 4px 0px var(--stroke-color);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .nb-icon-box {
+      display: inline-block;
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: 2px solid var(--stroke-color);
+      box-shadow: 2px 2px 0px var(--stroke-color);
+      padding: 2px 6px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      font-family: monospace;
+      border-radius: 4px;
+      vertical-align: middle;
+      margin-right: 4px;
+      text-shadow: none;
+    }
+    .nb-mini-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: 2px solid var(--stroke-color);
+      font-size: 0.72rem;
+      font-weight: 900;
+      font-family: monospace;
+      border-radius: 3px;
+      margin-right: 4px;
+      text-shadow: none;
+    }
+    .nb-alert-tag {
+      display: inline-block;
+      background: #010101;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: 900;
+      font-family: monospace;
+      border-radius: 4px;
+      margin-right: 8px;
+      letter-spacing: 0.05em;
+    }
+
+
+    /* ==========================================================================
+       Neubrutalism Background Patterns (印花樣式)
+       ========================================================================== */
+    body[data-pattern="dots"] {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px);
+      background-size: 20px 20px;
+    }
+    body[data-pattern="grid"] {
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+    }
+    body[data-pattern="diagonal"] {
+      background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 255, 255, 0.06) 10px,
+        rgba(255, 255, 255, 0.06) 12px
+      );
+    }
+    body[data-pattern="cross"] {
+      background-image: 
+        radial-gradient(circle, rgba(255, 255, 255, 0.18) 1.5px, transparent 1.5px),
+        radial-gradient(circle, var(--highlight-color) 1px, transparent 1px);
+      background-size: 28px 28px;
+      background-position: 0 0, 14px 14px;
+    }
+    body[data-pattern="checker"] {
+      background-image: 
+        linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%), 
+        linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.05) 75%), 
+        linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.05) 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+    }
+    body[data-pattern="none"] {
+      background-image: none;
+    }
+
+    header h1, 
+    .version-tag, 
+    .box-label, 
+    .status-badge, 
+    .zoom-btn, 
+    .info-icon,
+    .theme-selector,
+    .card h2 {
+      text-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    .btn {
+      /* 針對按鈕文字清晰度優化：若按鈕文字為深色則不加深色陰影，保持清晰易讀 */
+      text-shadow: none;
+    }
+
+    .styled-input, .styled-select {
+      text-shadow: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--headline-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    header {
+      background-color: var(--main-color);
+      color: var(--headline-color);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--stroke-color);
+      box-shadow: 0 3px 0 var(--stroke-color);
+      z-index: 50;
+    }
+
+    .header-left, .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .version-tag {
+      font-size: 0.7rem;
+      background: var(--button-bg);
+      color: var(--button-text);
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 2px solid var(--stroke-color);
+      font-family: monospace;
+      font-weight: 800;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+    }
+
+    .info-icon {
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--headline-color);
+      font-size: 0.95rem;
+      background: var(--secondary-color);
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 2px solid var(--stroke-color);
+      box-shadow: 2px 2px 0px var(--stroke-color);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .info-icon:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--stroke-color);
+    }
+    .info-icon:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    .theme-selector {
+      background: var(--input-bg);
+      color: var(--input-text);
+      border: 2px solid var(--stroke-color);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      outline: none;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+      cursor: pointer;
+    }
+    .theme-selector:focus {
+      background: var(--subpanel-bg);
+    }
+
+    #alarm-banner {
+      display: none;
+      background-color: var(--danger-color);
+      color: #ffffff;
+      padding: 10px 20px;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 800;
+      border-bottom: 3px solid var(--stroke-color);
+      z-index: 100;
+      text-shadow: 1px 1px 0px #010101;
+    }
+
+    .stop-alarm-btn {
+      background: #ffffff;
+      color: #010101;
+      border: 2px solid var(--stroke-color);
+      padding: 4px 12px;
+      font-weight: 800;
+      font-size: 0.78rem;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .stop-alarm-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--stroke-color);
+    }
+    .stop-alarm-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 16px;
+      padding: 16px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .video-container {
+      background-color: var(--main-color);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1.5px, transparent 1.5px);
+      background-size: 20px 20px;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--stroke-color);
+      box-shadow: var(--card-shadow);
+    }
+
+    .zoom-controls {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--subpanel-bg);
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 2px solid var(--stroke-color);
+      box-shadow: var(--geometric-shadow);
+      z-index: 30;
+    }
+
+    .zoom-btn {
+      background: var(--secondary-color);
+      color: var(--headline-color);
+      border: 2px solid var(--stroke-color);
+      border-radius: 5px;
+      width: 28px;
+      height: 28px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .zoom-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--stroke-color);
+    }
+    .zoom-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    .zoom-level {
+      color: var(--headline-color);
+      font-family: monospace;
+      font-weight: 800;
+      font-size: 0.78rem;
+      min-width: 44px;
+      text-align: center;
+      text-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    .video-viewport {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    /* While idle, the video layer must not intercept the empty-state CTA. */
+    .video-container.is-idle #viewport { pointer-events: none; }
+
+    .zoom-stage {
+      position: relative;
+      transform-origin: 0 0;
+      transition: transform 0.05s ease-out;
+    }
+
+    video {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .placeholder-text {
+      color: var(--paragraph-color);
+      font-size: 0.88rem;
+      position: absolute;
+      text-align: center;
+      padding: 16px 24px;
+      border: 3px dashed var(--stroke-color);
+      border-radius: 8px;
+      background: var(--subpanel-bg);
+      box-shadow: var(--geometric-shadow);
+      font-weight: 700;
+      text-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    .crop-box {
+      position: absolute;
+      border: 3px solid;
+      cursor: move;
+      display: none;
+      z-index: 10;
+      background-color: rgba(127, 95, 240, 0.15);
+      box-shadow: 3px 3px 0px rgba(1, 1, 1, 0.8);
+      touch-action: none;
+    }
+
+    .crop-box.paused-box {
+      opacity: 0.4;
+      border-style: dashed;
+    }
+
+    .crop-box.pixel-mode {
+      border-width: 2px !important;
+      border-style: dashed !important;
+      background: transparent !important;
+      box-shadow: none;
+      cursor: none;
+    }
+    /* A transparent halo gives the small probe a comfortable grab target. */
+    .crop-box.pixel-mode::before {
+      content: "";
+      position: absolute;
+      inset: -18px;
+    }
+    body.dragging-probe, body.dragging-probe * { cursor: none !important; }
+    .crop-box.pixel-mode .box-label,
+    .crop-box.pixel-mode .resize-handle {
+      display: none;
+    }
+
+    /* Single-point mode: a compact reticle stays fixed around the sampled
+       pixel instead of spanning the whole box, so large zones stay readable.
+       The dark halo keeps it visible on pale and saturated video alike. */
+    .crosshair-h, .crosshair-v {
+      position: absolute;
+      left: 50%; top: 50%;
+      background-color: var(--danger-color);
+      display: none;
+      pointer-events: none;
+      z-index: 3;
+      box-shadow: 0 0 0 1px rgba(1, 1, 1, 0.95), 0 0 4px 2px rgba(1, 1, 1, 0.55);
+    }
+    .crop-box.pixel-mode .crosshair-h,
+    .crop-box.pixel-mode .crosshair-v {
+      display: block;
+    }
+
+    .crosshair-h {
+      width: 32px; height: 2px;
+      transform: translate(-50%, -50%);
+    }
+    .crosshair-v {
+      width: 2px; height: 32px;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Leave a clear hole in the middle of both lines: the sampled pixel stays
+       completely uncovered, so alignment is not hidden by the reticle. */
+    .crop-box.pixel-mode .crosshair-h {
+      -webkit-mask-image: linear-gradient(90deg, #000 0 31%, transparent 31% 69%, #000 69% 100%);
+      mask-image: linear-gradient(90deg, #000 0 31%, transparent 31% 69%, #000 69% 100%);
+    }
+    .crop-box.pixel-mode .crosshair-v {
+      -webkit-mask-image: linear-gradient(180deg, #000 0 31%, transparent 31% 69%, #000 69% 100%);
+      mask-image: linear-gradient(180deg, #000 0 31%, transparent 31% 69%, #000 69% 100%);
+    }
+
+    .crosshair-center-gap {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 12px; height: 12px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      background: transparent;
+      box-shadow: 0 0 0 1px rgba(1, 1, 1, 0.95), 0 0 4px 2px rgba(1, 1, 1, 0.55);
+      display: none;
+      pointer-events: none;
+      z-index: 4;
+    }
+    .crop-box.pixel-mode .crosshair-center-gap {
+      display: block;
+    }
+
+    .point-tag {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(18px, -32px);
+      display: none;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      background: rgba(1, 1, 1, 0.72);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.35;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 5;
+      font-variant-numeric: tabular-nums;
+    }
+    .crop-box.pixel-mode .point-tag {
+      display: inline-flex;
+    }
+    .crop-box.pixel-mode.tag-below .point-tag {
+      transform: translate(18px, 8px);
+    }
+    .crop-box.pixel-mode.tag-left .point-tag {
+      transform: translate(calc(-100% - 18px), -32px);
+    }
+    .crop-box.pixel-mode.tag-left.tag-below .point-tag {
+      transform: translate(calc(-100% - 18px), 8px);
+    }
+    .point-swatch {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      border: 1px solid #ffffff;
+      background: var(--sample-color, #ffffff);
+      flex: none;
+    }
+    .crop-box.pixel-mode:focus-visible .crosshair-center-gap {
+      box-shadow: 0 0 0 3px var(--highlight-color), 0 0 0 5px rgba(1, 1, 1, 0.9);
+    }
+
+    .box-zone-1 { border-color: #7f5af0; }
+    .box-zone-2 { border-color: #ffd803; }
+    .box-zone-3 { border-color: #bae8e8; }
+
+    .box-label {
+      position: absolute;
+      top: -24px;
+      left: -3px;
+      color: #fffffe;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 2px solid var(--stroke-color);
+      white-space: nowrap;
+      pointer-events: none;
+      font-weight: 800;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+    }
+
+    .bg-zone-1 { background: #7f5af0; }
+    .bg-zone-2 { background: #ffd803; color: #232946; }
+    .bg-zone-3 { background: #bae8e8; color: #004643; }
+
+    .resize-handle {
+      width: 9px;
+      height: 9px;
+      background-color: #fffffe;
+      border: 2px solid var(--stroke-color);
+      position: absolute;
+      z-index: 5;
+    }
+
+    .handle-nw { top: -5px; left: -5px; cursor: nwse-resize; }
+    .handle-ne { top: -5px; right: -5px; cursor: nesw-resize; }
+    .handle-sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+    .handle-se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--stroke-color);
+      border-radius: 3px;
+    }
+
+    .card {
+      background: var(--main-color);
+      color: var(--headline-color);
+      border-radius: 10px;
+      padding: 16px;
+      border: 3px solid var(--stroke-color);
+      box-shadow: var(--card-shadow);
+    }
+
+    .card h2 {
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--headline-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px dashed var(--stroke-color);
+      padding-bottom: 8px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px 14px;
+      border: 3px solid var(--stroke-color);
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+      box-shadow: var(--geometric-shadow);
+      transition: transform 0.1s, box-shadow 0.1s, background-color 0.1s;
+    }
+
+    .btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px var(--stroke-color);
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    .btn-primary {
+      background-color: var(--button-bg);
+      color: var(--button-text);
+    }
+    .btn-primary:hover {
+      background-color: var(--button-hover);
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px var(--stroke-color);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: var(--headline-color);
+      margin-top: 8px;
+    }
+
+    .zone-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 2px solid var(--stroke-color);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: var(--subpanel-bg);
+      color: var(--subpanel-text);
+      box-shadow: 2px 2px 0px var(--stroke-color);
+    }
+
+    .zone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .zone-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--stroke-color);
+    }
+
+    .zone-body {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .color-swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      border: 2px solid var(--stroke-color);
+      background: var(--secondary-color);
+      flex-shrink: 0;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+    }
+
+    .color-info {
+      font-size: 0.75rem;
+      font-family: monospace;
+      flex: 1;
+      color: var(--subpanel-muted);
+    }
+    .color-info span {
+      color: var(--subpanel-text);
+      font-weight: 800;
+    }
+
+    .size-stepper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.73rem;
+      color: var(--subpanel-muted);
+      margin-top: 4px;
+    }
+
+    .step-btn {
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      background: var(--secondary-color);
+      color: var(--headline-color);
+      border: 2px solid var(--stroke-color);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .step-btn:hover {
+      background: var(--highlight-color);
+      color: var(--button-text);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--stroke-color);
+    }
+    .step-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    .toggle-btn {
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      border-radius: 6px;
+      border: 2px solid var(--stroke-color);
+      cursor: pointer;
+      background: var(--tertiary-color);
+      color: #010101;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .toggle-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--stroke-color);
+    }
+    .toggle-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    .toggle-btn.paused {
+      background: var(--secondary-color);
+      color: var(--paragraph-color);
+    }
+
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      border: 2px solid var(--stroke-color);
+      box-shadow: 2px 2px 0px var(--stroke-color);
+    }
+    .badge-off {
+      background: var(--secondary-color);
+      color: var(--paragraph-color);
+    }
+    .badge-on {
+      background: var(--tertiary-color);
+      color: #010101;
+    }
+    .badge-warn {
+      background: #ffd803;
+      color: #232946;
+    }
+
+    /* --- live sampling health ------------------------------------------- */
+    .health-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      margin-top: 8px;
+      padding: 5px 9px;
+      border: 1px dashed var(--ui-rim, var(--stroke-color));
+      border-radius: 7px;
+      background: var(--subpanel-bg);
+      color: var(--subpanel-text);
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .health-dot {
+      width: 8px; height: 8px; flex: none;
+      border-radius: 50%;
+      background: var(--paragraph-color);
+      box-shadow: 0 0 0 1px rgba(1, 1, 1, 0.45);
+    }
+    .health-row[data-state="ok"] .health-dot { background: #22c55e; }
+    .health-row[data-state="stale"] .health-dot { background: var(--danger-color); }
+    .health-row[data-state="stale"] { border-style: solid; }
+    .health-age {
+      margin-left: auto;
+      min-width: 5.6em;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--paragraph-color);
+      white-space: nowrap;
+    }
+
+    /* --- self-test ------------------------------------------------------- */
+    .test-block {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--ui-rim, var(--stroke-color));
+    }
+    .test-results {
+      list-style: none;
+      display: grid;
+      gap: 4px;
+      margin: 8px 0 0;
+      padding: 0;
+    }
+    .test-results li {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 7px;
+      border-radius: 6px;
+      background: var(--subpanel-bg);
+      color: var(--subpanel-text);
+      font-size: 0.68rem;
+      line-height: 1.4;
+    }
+    .test-results .test-verdict { font-weight: 800; white-space: nowrap; }
+    .test-results .pass .test-verdict { color: #22c55e; }
+    .test-results .fail .test-verdict { color: var(--danger-color); }
+
+    /* --- version history ------------------------------------------------- */
+    .version-tag {
+      cursor: pointer;
+      appearance: none;
+    }
+    .version-tag:hover { filter: brightness(1.08); }
+    .version-tag:focus-visible { outline: 2px solid var(--highlight-color); outline-offset: 2px; }
+    .version-history {
+      display: grid;
+      gap: 8px;
+      margin: 4px 0 16px;
+    }
+    .version-entry {
+      padding: 8px 10px;
+      border: 1px solid var(--ui-rim, var(--stroke-color));
+      border-radius: 8px;
+      background: var(--subpanel-bg);
+      color: var(--subpanel-text);
+    }
+    .version-entry h3 {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 0 0 5px;
+      font-size: 0.8rem;
+      color: var(--headline-color);
+    }
+    .version-date {
+      margin-left: auto;
+      font-size: 0.64rem;
+      font-weight: 600;
+      color: var(--paragraph-color);
+      font-variant-numeric: tabular-nums;
+    }
+    .version-latest {
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: var(--highlight-color);
+      color: #010101;
+      font-size: 0.6rem;
+      font-weight: 800;
+    }
+    .version-entry ul {
+      margin: 0;
+      padding-left: 17px;
+      font-size: 0.72rem;
+      line-height: 1.55;
+    }
+
+    /* Precision mode uses a probe, so box-size controls would be misleading. */
+    body[data-detect="pixel"] .size-stepper { display: none; }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--headline-color);
+      font-weight: 700;
+    }
+
+    .styled-input, .styled-select {
+      padding: 6px 8px;
+      background: var(--input-bg);
+      color: var(--input-text);
+      border: 2px solid var(--stroke-color);
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-family: monospace;
+      outline: none;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+    }
+    .styled-input:focus, .styled-select:focus {
+      border-color: var(--highlight-color);
+      background: var(--subpanel-bg);
+    }
+
+    .schedule-panel {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--subpanel-bg);
+      color: var(--subpanel-muted);
+      border: 2px solid var(--stroke-color);
+      font-size: 0.78rem;
+      box-shadow: 2px 2px 0px var(--stroke-color);
+    }
+
+    .schedule-panel .schedule-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      color: var(--subpanel-text);
+      font-weight: 800;
+    }
+
+    .log-box {
+      height: 110px;
+      background: var(--log-bg);
+      color: var(--log-text);
+      font-family: monospace;
+      font-size: 0.74rem;
+      line-height: 1.5;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 2px solid var(--stroke-color);
+      overflow-y: auto;
+      box-shadow: inset 2px 2px 0px rgba(1, 1, 1, 0.7);
+    }
+
+    /* Native <dialog> used as the info modal. The browser supplies the top
+       layer, inert background, Esc handling and focus return; we only style. */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      max-height: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--headline-color);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-overlay[open] {
+      display: flex;
+    }
+    .modal-overlay::backdrop {
+      background: rgba(1, 1, 1, 0.8);
+      overflow: hidden;
+      overscroll-behavior: contain;
+    }
+    .modal-overlay:modal {
+      overscroll-behavior: contain;
+    }
+    .modal-content {
+      background: var(--main-color);
+      border: 3px solid var(--stroke-color);
+      box-shadow: 6px 6px 0px var(--stroke-color);
+      padding: 24px;
+      border-radius: 12px;
+      width: 520px;
+      max-width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      color: var(--headline-color);
+    }
+    .modal-content h1 {
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      border-bottom: 2px solid var(--stroke-color);
+      padding-bottom: 8px;
+    }
+    .modal-content h2 {
+      margin: 12px 0 6px 0;
+      font-size: 0.9rem;
+      color: var(--highlight-color);
+      font-weight: 800;
+    }
+    .modal-content ul {
+      padding-left: 18px;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: var(--paragraph-color);
+    }
+    .modal-content b {
+      color: var(--headline-color);
+    }
+    .modal-close {
+      margin-top: 18px;
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: 3px solid var(--stroke-color);
+      padding: 8px 18px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: var(--geometric-shadow);
+      float: right;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .modal-close:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px var(--stroke-color);
+    }
+    .modal-close:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--stroke-color);
+    }
+
+    /* =======================================================================
+       STYLE KIT — design-token layer (added on top of the app's 9 palettes)
+
+       data-theme  on <body> = the existing 9 color palettes (untouched)
+       data-style  on <html> = the new swappable LOOK (this section)
+       Every rule below reads a var(--ui-*); components never name a style.
+       ======================================================================= */
+    body {
+      --ui-radius: 10px;
+      --ui-radius-sm: 6px;
+      --ui-pill: 999px;
+      --ui-border-w: 2px;
+      --ui-border-style: solid;
+      --ui-rim: var(--stroke-color);
+      --ui-surface: var(--main-color);
+      --ui-subsurface: var(--subpanel-bg);
+      --ui-shadow: 4px 4px 0 var(--stroke-color);
+      --ui-shadow-sm: 2px 2px 0 var(--stroke-color);
+      --ui-backdrop: none;
+      --ui-sheen: none;
+      --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --ui-heading-transform: none;
+      --ui-text-shadow: 1px 1px 0 var(--stroke-color);
+    }
+    html { color-scheme: dark; }
+
+    /* --- the one place components are re-skinned ----------------------- */
+    body { font-family: var(--ui-font); }
+    body * { font-family: inherit; } /* explicit mono classes keep their own */
+
+    header, .card, .video-container, .modal-content, .placeholder-text,
+    .style-bar, .theme-panel {
+      background-color: var(--ui-surface);
+      background-image: var(--ui-sheen);
+      border-color: var(--ui-rim);
+      border-width: var(--ui-border-w);
+      border-style: var(--ui-border-style);
+      border-radius: var(--ui-radius);
+      box-shadow: var(--ui-shadow);
+      backdrop-filter: var(--ui-backdrop);
+      -webkit-backdrop-filter: var(--ui-backdrop);
+    }
+    header {
+      border-width: 0 0 var(--ui-border-w);
+      border-radius: 0;
+      box-shadow: var(--ui-shadow-sm);
+    }
+
+    .btn, .theme-selector, .styled-input, .styled-select, .zone-card,
+    .schedule-panel, .zoom-controls, .zoom-btn, .step-btn, .toggle-btn,
+    .status-badge, .modal-close, .style-chip, .panel-btn, .text-input,
+    .icon-btn, .preset, .swatch {
+      border-color: var(--ui-rim);
+      border-width: var(--ui-border-w);
+      border-style: var(--ui-border-style);
+      border-radius: var(--ui-radius-sm);
+      box-shadow: var(--ui-shadow-sm);
+      background-image: var(--ui-sheen);
+    }
+    .status-badge, .swatch { border-radius: var(--ui-pill); }
+    .zone-card, .schedule-panel, .theme-selector, .styled-input,
+    .styled-select, .text-input, .preset {
+      background-color: var(--ui-subsurface);
+    }
+    .color-swatch, .box-label, .resize-handle, .nb-alert-tag { border-color: var(--ui-rim); }
+
+    /* MON / version / help chips belong to the brand row, so they follow the
+       same radius, rim, shadow and sheen as every other control instead of
+       keeping their hard 2px-offset look under Liquid Glass. */
+    .version-tag, .nb-icon-box, .nb-mini-tag {
+      border-color: var(--ui-rim);
+      border-width: var(--ui-border-w);
+      border-style: var(--ui-border-style);
+      border-radius: var(--ui-radius-sm);
+      box-shadow: var(--ui-shadow-sm);
+      background-image: var(--ui-sheen);
+    }
+
+    header h1, .version-tag, .box-label, .status-badge, .zoom-btn,
+    .info-icon, .theme-selector, .card h2, .zoom-level, .placeholder-text,
+    .style-bar-label {
+      text-shadow: var(--ui-text-shadow);
+    }
+    header h1, .card h2, .modal-content h1, .style-bar-label {
+      text-transform: var(--ui-heading-transform);
+    }
+
+    /* --- 1. Original (the app's untouched v2.9 look) ------------------- */
+    [data-style="original"] body {
+      --ui-radius: 10px;  --ui-radius-sm: 6px;  --ui-pill: 999px;
+      --ui-border-w: 2px; --ui-border-style: solid;
+      --ui-rim: var(--stroke-color);
+      --ui-surface: var(--main-color); --ui-subsurface: var(--subpanel-bg);
+      --ui-shadow: 4px 4px 0 var(--stroke-color);
+      --ui-shadow-sm: 2px 2px 0 var(--stroke-color);
+      --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --ui-heading-transform: none;
+      --ui-text-shadow: 1px 1px 0 var(--stroke-color);
+    }
+
+    /* --- 2. Glass ------------------------------------------------------ */
+    [data-style="glass"] body {
+      --ui-radius: 18px; --ui-radius-sm: 999px; --ui-border-w: 1px;
+      --ui-rim: rgb(255 255 255 / 0.55);
+      --ui-surface: color-mix(in srgb, var(--main-color) 62%, transparent);
+      --ui-subsurface: color-mix(in srgb, var(--subpanel-bg) 70%, transparent);
+      --ui-backdrop: blur(18px) saturate(1.4);
+      --ui-shadow: 0 24px 50px -28px rgb(0 0 0 / 0.7);
+      --ui-shadow-sm: 0 6px 16px -10px rgb(0 0 0 / 0.6);
+      --ui-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 48%);
+      --ui-text-shadow: none;
+    }
+
+    /* --- 3. Liquid Glass (Apple-style material) ------------------------ */
+    [data-style="liquid"] body {
+      --ui-radius: 26px; --ui-radius-sm: 999px; --ui-border-w: 1px;
+      --ui-rim: rgb(255 255 255 / 0.72);
+      --ui-surface: color-mix(in srgb, var(--main-color) 50%, transparent);
+      --ui-subsurface: color-mix(in srgb, var(--subpanel-bg) 62%, transparent);
+      --ui-backdrop: blur(30px) saturate(1.9);
+      --ui-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.85),
+        inset 0 -1px 0 rgb(255 255 255 / 0.22),
+        0 22px 48px -24px rgb(0 0 0 / 0.7);
+      --ui-shadow-sm:
+        inset 0 1px 0 rgb(255 255 255 / 0.7),
+        0 8px 18px -12px rgb(0 0 0 / 0.6);
+      --ui-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.22), transparent 45%);
+      --ui-text-shadow: none;
+    }
+    /* Cards need a containing block for the ::after sheen. The panel must NOT
+       be made relative — that knocks it out of its fixed corner and into the
+       page flow, so opening it would push the whole layout around. */
+    [data-style="liquid"] .card { position: relative; }
+    [data-style="liquid"] .card::after,
+    [data-style="liquid"] .theme-panel::after {
+      content: ""; position: absolute; inset: 0; border-radius: inherit;
+      pointer-events: none; z-index: 1;
+      background: radial-gradient(130% 90% at 12% -10%, rgb(255 255 255 / 0.28), transparent 58%);
+    }
+
+    /* --- 4. Neumorphism ------------------------------------------------ */
+    [data-style="neumorph"] body {
+      --ui-radius: 22px; --ui-radius-sm: 14px; --ui-border-w: 0px;
+      --ui-rim: transparent;
+      --ui-surface: var(--bg-color); --ui-subsurface: var(--bg-color);
+      --ui-shadow:
+        10px 10px 24px rgb(0 0 0 / 0.6),
+        -10px -10px 24px rgb(255 255 255 / 0.06);
+      --ui-shadow-sm:
+        4px 4px 10px rgb(0 0 0 / 0.55),
+        -4px -4px 10px rgb(255 255 255 / 0.06);
+      --ui-text-shadow: none;
+    }
+
+    /* --- 5. Brutalism -------------------------------------------------- */
+    [data-style="brutal"] body {
+      --ui-radius: 0px; --ui-radius-sm: 0px; --ui-pill: 0px;
+      --ui-border-w: 3px;
+      --ui-rim: var(--headline-color);
+      --ui-shadow: 7px 7px 0 var(--stroke-color);
+      --ui-shadow-sm: 4px 4px 0 var(--stroke-color);
+      --ui-font: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --ui-heading-transform: uppercase;
+    }
+
+    /* --- 6. Dark Neubrutalism (the reference design) ------------------- */
+    [data-style="neubrutal"] body {
+      --ui-radius: 12px; --ui-radius-sm: 9px; --ui-border-w: 3px;
+      --ui-rim: #010101;
+      --ui-shadow: 5px 5px 0 #010101;
+      --ui-shadow-sm: 3px 3px 0 #010101;
+      --ui-font: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    [data-style="neubrutal"] .btn:hover {
+      transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #010101;
+    }
+    [data-style="neubrutal"] .btn:active {
+      transform: translate(2px, 2px); box-shadow: 2px 2px 0 #010101;
+    }
+
+    /* --- 7. Clay ------------------------------------------------------- */
+    [data-style="clay"] body {
+      --ui-radius: 26px; --ui-radius-sm: 14px; --ui-border-w: 1px;
+      --ui-rim: color-mix(in srgb, var(--headline-color) 18%, transparent);
+      --ui-shadow:
+        0 18px 32px -16px rgb(0 0 0 / 0.65),
+        inset 0 -6px 12px rgb(0 0 0 / 0.3),
+        inset 0 6px 12px rgb(255 255 255 / 0.12);
+      --ui-shadow-sm:
+        0 8px 16px -8px rgb(0 0 0 / 0.6),
+        inset 0 2px 4px rgb(255 255 255 / 0.14);
+      --ui-text-shadow: none;
+    }
+
+    /* --- 8. Editorial -------------------------------------------------- */
+    [data-style="editorial"] body {
+      --ui-radius: 4px; --ui-radius-sm: 2px; --ui-border-w: 1px;
+      --ui-rim: color-mix(in srgb, var(--headline-color) 32%, transparent);
+      --ui-shadow: none; --ui-shadow-sm: none;
+      --ui-font: Georgia, "Iowan Old Style", "Noto Serif", "Times New Roman", serif;
+      --ui-text-shadow: none;
+    }
+
+    /* --- 9. Terminal --------------------------------------------------- */
+    [data-style="terminal"] body {
+      --ui-radius: 0px; --ui-radius-sm: 0px; --ui-pill: 0px;
+      --ui-border-w: 1px; --ui-border-style: dashed;
+      --ui-rim: color-mix(in srgb, var(--highlight-color) 65%, transparent);
+      --ui-shadow: none; --ui-shadow-sm: none;
+      --ui-font: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --ui-heading-transform: uppercase;
+      --ui-text-shadow: none;
+    }
+
+    /* --- 10. Aurora ---------------------------------------------------- */
+    [data-style="aurora"] body {
+      --ui-radius: 18px; --ui-radius-sm: 999px; --ui-border-w: 1px;
+      --ui-rim: color-mix(in srgb, var(--button-bg) 45%, transparent);
+      --ui-surface: color-mix(in srgb, var(--main-color) 70%, transparent);
+      --ui-subsurface: color-mix(in srgb, var(--subpanel-bg) 75%, transparent);
+      --ui-backdrop: blur(12px);
+      --ui-shadow:
+        0 0 0 1px color-mix(in srgb, var(--button-bg) 22%, transparent),
+        0 28px 60px -32px var(--button-bg);
+      --ui-shadow-sm: 0 0 0 1px color-mix(in srgb, var(--button-bg) 20%, transparent);
+      --ui-sheen: linear-gradient(135deg, color-mix(in srgb, var(--button-bg) 14%, transparent), transparent 55%);
+      --ui-text-shadow: none;
+    }
+
+    /* --- the style bar -------------------------------------------------- */
+    .style-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 14px;
+      border-width: 0 0 var(--ui-border-w);
+      border-radius: 0;
+      box-shadow: var(--ui-shadow-sm);
+      z-index: 40;
+    }
+    .style-bar-label {
+      flex: none; font-size: 0.63rem; font-weight: 900;
+      letter-spacing: 0.12em; color: var(--paragraph-color);
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
+    .style-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 9px; font-size: 0.7rem; font-weight: 800;
+      color: var(--subpanel-muted); background-color: var(--subpanel-bg);
+      cursor: pointer; transition: transform 0.1s, background-color 0.15s, color 0.15s;
+    }
+    .style-chip:hover { color: var(--headline-color); }
+    .style-chip[aria-pressed="true"] {
+      background-color: var(--button-bg); color: var(--button-text);
+      transform: translateY(-1px);
+    }
+    .chip-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sw); }
+    .panel-btn {
+      flex: none; padding: 5px 11px; font-size: 0.7rem; font-weight: 800;
+      background-color: var(--secondary-color); color: var(--headline-color);
+      cursor: pointer;
+    }
+
+    /* --- the storage panel -------------------------------------------- */
+    .theme-panel {
+      position: fixed; right: 18px; bottom: 18px; z-index: 900;
+      width: 300px; max-height: calc(100vh - 36px); max-height: calc(100dvh - 36px); overflow-y: auto;
+      padding: 14px; color: var(--headline-color);
+    }
+    .theme-panel[hidden] { display: none; }
+
+    /* Tether the looks panel to the gear button where anchor positioning is
+       supported; older browsers get the JS clamp fallback. */
+    #openStylePanel { anchor-name: --looks-trigger; }
+    @supports (anchor-name: --a) and (position-anchor: --a) {
+      #themePanel:not([hidden]) {
+        position-anchor: --looks-trigger;
+        top: anchor(bottom);
+        right: anchor(right);
+        left: auto;
+        bottom: auto;
+        margin-top: 8px;
+        position-try-fallbacks: flip-block;
+      }
+    }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .panel-head h2 { font-size: 0.9rem; font-weight: 800; }
+    .icon-btn {
+      width: 26px; height: 26px; background: var(--secondary-color);
+      color: var(--headline-color); cursor: pointer; font-size: 0.75rem;
+    }
+    .panel-group { margin-bottom: 12px; padding-top: 10px; border-top: 1px solid var(--ui-rim); }
+    .panel-label { display: block; margin-bottom: 6px; color: var(--paragraph-color); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; }
+    .toggle { display: flex; align-items: center; gap: 7px; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
+    .toggle input { accent-color: var(--button-bg); }
+    .preset-form { display: flex; gap: 6px; margin-top: 8px; }
+    .text-input { flex: 1; min-width: 0; padding: 6px 8px; font-size: 0.72rem; color: var(--input-text); }
+    .preset-form .panel-btn { flex: none; }
+    .preset-list { list-style: none; margin: 8px 0 0; max-height: 130px; overflow-y: auto; display: grid; gap: 5px; }
+    .preset { display: flex; align-items: center; gap: 4px; padding: 3px 5px 3px 8px; }
+    .preset-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; box-shadow: none; background: none; color: var(--subpanel-text); font-size: 0.72rem; font-weight: 700; text-align: left; cursor: pointer; }
+    .preset-name:hover { color: var(--highlight-color); }
+    .preset-del { flex: none; width: 20px; height: 20px; border: 0; box-shadow: none; background: none; color: var(--paragraph-color); cursor: pointer; font-size: 0.7rem; }
+    .preset-del:hover { color: var(--danger-color); }
+    .preset-empty { margin: 8px 0 0; color: var(--paragraph-color); font-size: 0.7rem; }
+    .preset-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .preset-actions .panel-btn { padding: 5px 9px; background: var(--secondary-color); }
+    .storage-status { margin: 8px 0 0; color: var(--paragraph-color); font-size: 0.68rem; line-height: 1.45; }
+    .panel-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--ui-rim); color: var(--paragraph-color); font-size: 0.68rem; }
+
+    @media (max-width: 1080px) {
+      .style-bar-label { display: none; }
+      .chips { flex-wrap: nowrap; overflow-x: auto; }
+      .style-chip { flex: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+
+    /* --- accessibility & layout utilities (v2.9.1) ---------------------- */
+    .visually-hidden:where(:not(:focus-within, :active)) {
+      position: absolute !important;
+      clip-path: inset(50%) !important;
+      overflow: hidden !important;
+      width: 1px !important;
+      height: 1px !important;
+      margin: -1px !important;
+      padding: 0 !important;
+      border: 0 !important;
+      white-space: nowrap !important;
+    }
+
+    /* Keep a visible focus ring even where a control opts out of the default one. */
+    :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+      outline: 3px solid var(--highlight-color);
+      outline-offset: 2px;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: var(--geometric-shadow);
+    }
+
+    .btn.needs-attention {
+      animation: attention-pulse 1.2s ease-in-out 3;
+    }
+    @keyframes attention-pulse {
+      50% { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--stroke-color); }
+    }
+
+    .crop-box:focus-visible {
+      outline: 3px solid var(--highlight-color);
+      outline-offset: 3px;
+    }
+
+    /* --- small screens: stack the panel under the video, allow scrolling -- */
+    @media (max-width: 900px) {
+      body { height: auto; min-height: 100vh; min-height: 100dvh; overflow: auto; }
+      header { flex-wrap: wrap; gap: 8px; }
+      .header-left, .header-right { flex-wrap: wrap; }
+      main { grid-template-columns: 1fr; overflow: visible; }
+      .video-container { min-height: 45vh; }
+      .sidebar { overflow: visible; padding-right: 0; }
+      .theme-panel { width: calc(100vw - 36px); }
+    }
+
+    /* =======================================================================
+       v2.9.3 — health watchdog, self-test, precision sampling, anchored looks panel
+       ======================================================================= */
+
+    /* --- one compact header; every appearance control moved to the panel -- */
+    header {
+      padding: 8px 16px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .header-left, .header-right { gap: 8px; min-width: 0; }
+    header h1 { font-size: 0.98rem; white-space: nowrap; }
+    .header-right { margin-left: auto; }
+    .header-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      min-height: 32px; padding: 5px 11px;
+      font-family: inherit; font-size: 0.76rem; font-weight: 800; line-height: 1;
+      background: var(--secondary-color); color: var(--headline-color);
+      cursor: pointer;
+      border: var(--ui-border-w, 2px) solid var(--ui-rim, var(--stroke-color));
+      border-radius: var(--ui-radius-sm, 6px);
+      box-shadow: var(--ui-shadow-sm, 2px 2px 0 var(--stroke-color));
+      transition: transform .15s ease, background-color .15s ease, box-shadow .15s ease;
+    }
+    .header-btn:hover { transform: translateY(-1px); }
+    .header-btn:active { transform: translateY(0); }
+    .header-btn[aria-expanded="true"] { background: var(--button-bg); color: var(--button-text); }
+    .info-icon { padding: 5px 11px; font-size: 0.76rem; }
+    .lang-btn { min-width: 48px; font-family: ui-monospace, monospace; letter-spacing: .02em; }
+
+    /* --- collapsible sections keep every control but hide the noise ------ */
+    .fold {
+      border: var(--ui-border-w, 2px) solid var(--ui-rim, var(--stroke-color));
+      border-radius: var(--ui-radius-sm, 8px);
+      background: var(--ui-subsurface, var(--subpanel-bg));
+      box-shadow: var(--ui-shadow-sm, 2px 2px 0 var(--stroke-color));
+      overflow: clip;
+    }
+    .fold > summary {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px; cursor: pointer; list-style: none;
+      font-size: 0.78rem; font-weight: 800; color: var(--headline-color);
+      -webkit-user-select: none; user-select: none;
+    }
+    .fold > summary::-webkit-details-marker { display: none; }
+    .fold > summary::before {
+      content: "▸"; flex: none;
+      font-size: 0.82rem; color: var(--highlight-color);
+      transition: transform .18s ease;
+    }
+    .fold[open] > summary::before { transform: rotate(90deg); }
+    .fold > summary:focus-visible { outline: 3px solid var(--highlight-color); outline-offset: -3px; }
+    .fold > .fold-body { padding: 0 12px 12px; }
+    .fold .count {
+      margin-left: auto; text-align: right;
+      font-family: ui-monospace, monospace; font-size: 0.66rem; font-weight: 700;
+      color: var(--paragraph-color);
+    }
+
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .btn-row .btn { margin-top: 0; padding-left: 8px; padding-right: 8px; }
+    .btn-lg { padding: 13px 16px; font-size: 0.9rem; }
+    .sidebar { gap: 10px; }
+    .card { padding: 13px; }
+    .card h2 { margin-bottom: 10px; }
+    .zone-card { margin-bottom: 8px; }
+
+    /* --- theme panel = the only place for look controls ------------------ */
+    .theme-panel { width: 340px; padding: 16px; }
+    .panel-select { width: 100%; }
+    .panel-name { font-size: 0.78rem; font-weight: 800; }
+    .panel-hint { margin-top: 6px; font-size: 0.68rem; line-height: 1.5; color: var(--paragraph-color); }
+    #styleChips.chips { flex: none; flex-wrap: wrap; overflow: visible; }
+    .color-picker-row { display: flex; align-items: center; gap: 8px; }
+
+    /* --- Liquid Glass, following the iOS 26/27 material language --------- */
+    html[data-style="liquid"] {
+      background:
+        linear-gradient(180deg, rgb(7 7 12 / 0.42), rgb(7 7 12 / 0.78)),
+        radial-gradient(58% 50% at 12% 6%, #6a5cff 0%, transparent 60%),
+        radial-gradient(52% 44% at 88% 10%, #00c6ff 0%, transparent 62%),
+        radial-gradient(58% 54% at 80% 94%, #ff5ea8 0%, transparent 60%),
+        radial-gradient(48% 44% at 6% 90%, #00e0b8 0%, transparent 62%),
+        #07070c;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+    html[data-style="liquid"] body {
+      background-color: transparent;
+      background-image: none;
+      --ui-radius: 28px;
+      --ui-radius-sm: 16px;
+      --ui-pill: 999px;
+      --ui-border-w: 1px;
+      --ui-border-style: solid;
+      --ui-rim: rgb(255 255 255 / 0.30);
+      --ui-surface: rgb(20 20 28 / 0.42);
+      --ui-subsurface: rgb(255 255 255 / 0.10);
+      --ui-backdrop: blur(34px) saturate(1.9);
+      --ui-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.55),
+        inset 0 -1px 1px rgb(0 0 0 / 0.35),
+        0 26px 60px -30px rgb(0 0 0 / 0.75);
+      --ui-shadow-sm:
+        inset 0 1px 0 rgb(255 255 255 / 0.60),
+        inset 0 -1px 1px rgb(0 0 0 / 0.25),
+        0 10px 24px -16px rgb(0 0 0 / 0.7);
+      --ui-sheen: linear-gradient(155deg, rgb(255 255 255 / 0.30), rgb(255 255 255 / 0.05) 34%, transparent 60%);
+      --ui-font: -apple-system, "SF Pro Text", BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      --ui-text-shadow: none;
+    }
+    html[data-style="liquid"] .card:hover,
+    html[data-style="liquid"] .zone-card:hover { transform: none; }
+    html[data-style="liquid"] .card h2 {
+      border-bottom-style: solid;
+      border-bottom-color: rgb(255 255 255 / 0.18);
+    }
+    html[data-style="liquid"] header {
+      background-color: rgb(12 12 18 / 0.36);
+      border-bottom-color: rgb(255 255 255 / 0.22);
+    }
+    html[data-style="liquid"] .video-container {
+      background-color: rgb(10 10 16 / 0.30);
+      background-image: linear-gradient(160deg, rgb(255 255 255 / 0.10), transparent 55%);
+    }
+    html[data-style="liquid"] .btn,
+    html[data-style="liquid"] .header-btn,
+    html[data-style="liquid"] .style-chip,
+    html[data-style="liquid"] .panel-btn,
+    html[data-style="liquid"] .zoom-btn,
+    html[data-style="liquid"] .step-btn,
+    html[data-style="liquid"] .toggle-btn,
+    html[data-style="liquid"] .stop-alarm-btn {
+      border-radius: 999px;
+      border-color: rgb(255 255 255 / 0.28);
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.55),
+        0 8px 20px -12px rgb(0 0 0 / 0.65);
+      transition: transform .18s cubic-bezier(.2, .8, .2, 1), background-color .18s ease, box-shadow .18s ease;
+    }
+    html[data-style="liquid"] .btn:hover,
+    html[data-style="liquid"] .header-btn:hover,
+    html[data-style="liquid"] .zoom-btn:hover,
+    html[data-style="liquid"] .step-btn:hover,
+    html[data-style="liquid"] .toggle-btn:hover { transform: translateY(-1px); }
+    html[data-style="liquid"] .btn-primary {
+      background-color: color-mix(in srgb, var(--button-bg) 78%, white 22%);
+      color: #0a0a0f;
+    }
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      html[data-style="liquid"] body {
+        --ui-surface: rgb(18 18 26 / 0.94);
+        --ui-subsurface: rgb(38 38 50 / 0.94);
+      }
+    }
+    @media (prefers-reduced-transparency: reduce) {
+      /* Keep the colored backdrop, drop only the blur + see-through surfaces. */
+      html[data-style="liquid"] body {
+        --ui-surface: rgb(18 18 26 / 0.97);
+        --ui-subsurface: rgb(38 38 50 / 0.97);
+        --ui-backdrop: none;
+      }
+    }
+    @media (max-width: 900px) {
+      .header-right { width: 100%; justify-content: flex-end; }
+      .theme-panel { left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 72dvh; }
+    }
+
+    /* --- stable metrics: nothing should move when the language changes ----
+       `line-height: normal` resolves against each font's own ascent/descent,
+       so the same label is ~3px taller in Chinese than in English. The cards,
+       header and zone rows therefore jumped on every language switch. Fixed
+       ratios make both languages lay out identically. */
+    body { line-height: 1.5; }
+    header h1,
+    .card h2,
+    .fold > summary,
+    .zone-header,
+    .zone-title,
+    .btn,
+    .header-btn,
+    .toggle-btn,
+    .step-btn,
+    .panel-name,
+    .modal-content h1,
+    .modal-content h2,
+    .placeholder-text { line-height: 1.35; }
+
+    /* Controls whose label length differs per language get a fixed footprint,
+       so the header never reflows around them. */
+    #system-status {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 80px;
+    }
+    #lang-toggle { min-width: 52px; }
+    #openStylePanel { min-width: 92px; }
+    .info-icon[onclick] { min-width: 78px; }
+    #timer-btn { min-width: 108px; }
+
+    /* Live values (colour, delta, size, counters) get tabular figures so the
+       digits stop nudging the text beside them. */
+    #rgb-1, #rgb-2, #rgb-3,
+    #delta-1, #delta-2, #delta-3,
+    #size-1, #size-2, #size-3,
+    #sens-val, #timer-status, #log-count, #zoom-level, #health-age,
+    #start-target-time, #stop-target-time, #interval-sec {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+    }
+    #zoom-level { display: inline-block; min-width: 3.4em; text-align: center; }
+    #log-count {
+      min-width: 2.2em; padding: 1px 6px; border-radius: 999px;
+      background: var(--ui-subsurface, var(--subpanel-bg));
+      color: var(--subpanel-text, var(--paragraph-color));
+      text-align: center;
+    }
+    .color-info > div:first-child { white-space: nowrap; }
+
+    /* --- the log explains itself while it is empty ------------------------ */
+    #log-box:empty::before {
+      content: "尚無事件紀錄";
+      display: block;
+      color: var(--paragraph-color);
+      opacity: .7;
+    }
+    html[data-lang="en"] #log-box:empty::before { content: "No events yet."; }
+
+    /* --- the empty stage says what to do and offers the action ------------ */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      max-width: min(340px, 82%);
+      padding: 20px 24px;
+      text-align: center;
+      z-index: 20;
+    }
+    .empty-error {
+      margin: 2px 0 0;
+      max-width: 250px;
+      color: var(--danger-color);
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .empty-badge {
+      font-family: ui-monospace, monospace; font-size: 0.62rem; letter-spacing: .2em;
+      padding: 2px 9px; border-radius: 999px;
+      border: 2px solid currentColor; opacity: .8;
+    }
+    .empty-title { font-size: 0.95rem; color: var(--headline-color); line-height: 1.35; }
+    .empty-hint {
+      font-size: 0.78rem; font-weight: 500; line-height: 1.5;
+      color: var(--paragraph-color); text-shadow: none;
+    }
+    .empty-cta { margin-top: 4px; width: 100%; max-width: 250px; }
+
+    /* --- the header stays available while the page scrolls ---------------- */
+    header {
+      position: sticky; top: 0; z-index: 60;
+      backdrop-filter: var(--ui-backdrop, none);
+      -webkit-backdrop-filter: var(--ui-backdrop, none);
+    }
+    html { scroll-padding-top: 64px; }
+
+    /* --- comfortable touch targets without changing the desktop layout ---- */
+    @media (pointer: coarse) {
+      .header-btn { min-height: 40px; }
+      .btn { min-height: 48px; }
+      .step-btn, .toggle-btn { min-width: 34px; min-height: 34px; }
+    }
+
+    canvas { display: none; }
+  </style>
+</head>
+<body data-theme="purple-dark" data-pattern="dots">
+  <!-- Style Kit: restore the app's own palette/pattern before the page renders. -->
+  <script>
+    (function () {
+      var P = 'job-monitor-v282-stylekit';
+      try {
+        if (localStorage.getItem(P + ':remember') === '0') return;
+        var s = JSON.parse(localStorage.getItem(P) || '{}') || {};
+        if (s.colorTheme) document.body.setAttribute('data-theme', s.colorTheme);
+        if (s.pattern) document.body.setAttribute('data-pattern', s.pattern);
+        if (s.customColor) document.documentElement.style.setProperty('--custom-accent', s.customColor);
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
+
+  <header>
+    <div class="header-left">
+      <h1><span class="nb-icon-box" aria-hidden="true">MON</span> <span data-i18n="app.title">多區域色彩監控器</span></h1>
+      <button type="button" class="version-tag" id="version-history-btn" aria-haspopup="dialog" aria-label="v2.9.3 版本歷史" data-i18n-aria="version.open">v2.9.3</button>
+    </div>
+    <div class="header-right">
+      <span id="system-status" class="status-badge badge-off" role="status" aria-live="polite">待機中</span>
+      <button type="button" class="header-btn lang-btn" id="lang-toggle" aria-label="切換語言 / Switch language">EN</button>
+      <button type="button" class="header-btn info-icon" id="openStylePanel" aria-controls="themePanel" aria-expanded="false" aria-label="外觀設定" data-i18n-aria="header.settingsAria"><span aria-hidden="true">⚙</span> <span data-i18n="header.settings">外觀</span></button>
+      <button type="button" class="header-btn info-icon" onclick="toggleModal(true)" aria-haspopup="dialog"><span class="nb-mini-tag" aria-hidden="true">?</span> <span data-i18n="header.help">說明</span></button>
+    </div>
+  </header>
+
+  <!-- Every appearance control now lives in this one panel. -->
+  <aside class="theme-panel" id="themePanel" aria-label="外觀與儲存設定" data-i18n-aria="panel.aria" hidden>
+    <div class="panel-head">
+      <h2 data-i18n="panel.title">外觀設定</h2>
+      <button class="icon-btn" id="closeStylePanel" type="button" aria-label="關閉" data-i18n-aria="panel.close"><span aria-hidden="true">✕</span></button>
+    </div>
+
+    <div class="panel-group">
+      <label class="panel-label" for="theme-selector" data-i18n="panel.palette">配色主題</label>
+      <select id="theme-selector" class="theme-selector panel-select" onchange="changeTheme(this.value)">
+        <option value="purple-dark" selected data-i18n="theme.purple">■ 經典紫藍</option>
+        <option value="bright-yellow" data-i18n="theme.yellow">■ 醒目黃</option>
+        <option value="coral-pink" data-i18n="theme.coral">■ 珊瑚粉</option>
+        <option value="sky-blue" data-i18n="theme.sky">■ 天藍</option>
+        <option value="soft-green" data-i18n="theme.green">■ 柔和綠</option>
+        <option value="vibrant-orange" data-i18n="theme.orange">■ 橘子</option>
+        <option value="lavender" data-i18n="theme.lavender">■ 薰衣草</option>
+        <option value="gray-theme" data-i18n="theme.gray">■ 灰色</option>
+        <option value="custom-theme" data-i18n="theme.custom">◈ 自定顏色</option>
+      </select>
+      <div class="color-picker-row" style="margin-top:8px;">
+        <input type="color" id="custom-color-picker" value="#3498DB" aria-label="自定主色調" data-i18n-aria="panel.customColor" style="display:none; width:34px; height:34px; border:2px solid var(--ui-rim); border-radius:8px; cursor:pointer; background:var(--input-bg); padding:0;" onchange="updateCustomColor(this.value)">
+        <span class="panel-hint" style="margin:0;" data-i18n="panel.customHint">選「自定顏色」後可挑選主色調。</span>
+      </div>
+    </div>
+
+    <div class="panel-group">
+      <label class="panel-label" for="pattern-selector" data-i18n="panel.pattern">背景印花樣式</label>
+      <select id="pattern-selector" class="theme-selector panel-select" onchange="changePattern(this.value)">
+        <option value="dots" selected data-i18n="pattern.dots">∷ 經典波點</option>
+        <option value="grid" data-i18n="pattern.grid">⊞ 方格網線</option>
+        <option value="diagonal" data-i18n="pattern.diagonal">▨ 工業斜紋</option>
+        <option value="cross" data-i18n="pattern.cross">✦ 雙色星點</option>
+        <option value="checker" data-i18n="pattern.checker">▤ 棋盤方塊</option>
+        <option value="none" data-i18n="pattern.none">□ 純色無印花</option>
+      </select>
+    </div>
+
+    <div class="panel-group">
+      <span class="panel-label" data-i18n="panel.style">設計風格</span>
+      <div class="chips" id="styleChips" role="group" aria-label="切換設計風格" data-i18n-aria="panel.styleAria">
+        <button class="style-chip" type="button" data-skin="original" aria-pressed="true"><span class="chip-dot" style="--sw:#7f5af0"></span><span data-i18n="style.original">原版</span></button>
+        <button class="style-chip" type="button" data-skin="glass"><span class="chip-dot" style="--sw:#74b9ff"></span><span data-i18n="style.glass">玻璃</span></button>
+        <button class="style-chip" type="button" data-skin="liquid"><span class="chip-dot" style="--sw:#0a84ff"></span><span data-i18n="style.liquid">液態玻璃</span></button>
+        <button class="style-chip" type="button" data-skin="neumorph"><span class="chip-dot" style="--sw:#6366f1"></span><span data-i18n="style.neumorph">新擬態</span></button>
+        <button class="style-chip" type="button" data-skin="brutal"><span class="chip-dot" style="--sw:#facc15"></span><span data-i18n="style.brutal">野獸派</span></button>
+        <button class="style-chip" type="button" data-skin="neubrutal"><span class="chip-dot" style="--sw:#010101"></span><span data-i18n="style.neubrutal">暗黑粗獷</span></button>
+        <button class="style-chip" type="button" data-skin="clay"><span class="chip-dot" style="--sw:#ec4899"></span><span data-i18n="style.clay">黏土</span></button>
+        <button class="style-chip" type="button" data-skin="editorial"><span class="chip-dot" style="--sw:#b91c1c"></span><span data-i18n="style.editorial">雜誌</span></button>
+        <button class="style-chip" type="button" data-skin="terminal"><span class="chip-dot" style="--sw:#22c55e"></span><span data-i18n="style.terminal">終端機</span></button>
+        <button class="style-chip" type="button" data-skin="aurora"><span class="chip-dot" style="--sw:#8b5cf6"></span><span data-i18n="style.aurora">極光</span></button>
+      </div>
+    </div>
+
+    <div class="panel-group">
+      <span class="panel-label" data-i18n="panel.current">目前外觀</span>
+      <div id="currentStyleName" class="panel-name">原版 (Original)</div>
+      <p class="panel-hint" data-i18n="panel.note">配色與印花由上方控制；風格可獨立切換，兩者會一起存入已儲存的外觀。</p>
+    </div>
+
+    <div class="panel-group">
+      <span class="panel-label" data-i18n="panel.storage">儲存設定</span>
+      <label class="toggle">
+        <input type="checkbox" id="rememberStyle" autocomplete="off" />
+        <span data-i18n="panel.remember">記住我的外觀設定</span>
+      </label>
+
+      <div class="preset-form">
+        <input class="text-input" type="text" id="presetName" maxlength="28" placeholder="命名這個外觀..." data-i18n-ph="panel.presetPh" autocomplete="off" aria-label="已儲存外觀的名稱" data-i18n-aria="panel.presetAria" />
+        <button class="panel-btn" type="button" id="savePreset" data-i18n="panel.save">儲存</button>
+      </div>
+
+      <ul class="preset-list" id="presetList"></ul>
+
+      <div class="preset-actions">
+        <button class="panel-btn" type="button" id="exportSettings" data-i18n="panel.export">匯出 JSON</button>
+        <button class="panel-btn" type="button" id="importSettings" data-i18n="panel.import">匯入 JSON</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden />
+      </div>
+
+      <p class="storage-status" id="storageStatus" role="status"></p>
+    </div>
+
+    <div class="panel-foot">
+      <span data-i18n="panel.foot">外觀獨立儲存 · 監控設定不受影響</span>
+      <button class="panel-btn" type="button" id="resetStyle" style="background:var(--secondary-color)" data-i18n="panel.reset">重設</button>
+    </div>
+  </aside>
+
+  <div id="alarm-banner">
+    <span id="alarm-banner-text">[ALERT] 偵測到 狀態顏色變更！警報響起中...</span>
+    <button class="stop-alarm-btn" type="button" onclick="stopAlarmSound(true)" data-i18n="alarm.dismiss">解除警報</button>
+  </div>
+  <div id="sr-alerts" class="visually-hidden" role="alert" aria-live="assertive"></div>
+
+  <dialog id="info-modal" class="modal-overlay" aria-labelledby="info-modal-title" closedby="any">
+    <div class="modal-content">
+      <h1 id="info-modal-title"><span class="nb-icon-box" style="margin-right:6px;" aria-hidden="true">GUIDE</span> <span data-i18n="guide.title">v2.9.3 使用方法與功能指南</span></h1>
+
+      <h2 data-i18n="guide.s1">1. 開始監控畫面</h2>
+      <ul>
+        <li data-i18n="guide.s1a">點擊右側控制面板的「開始分享監控畫面」按鈕。</li>
+        <li data-i18n="guide.s1b">在瀏覽器彈出的視窗中，選擇要監控的分頁、視窗或整個螢幕（建議選擇狀態監控畫面所在的視窗）。</li>
+      </ul>
+
+      <h2 data-i18n="guide.s2">2. 區域設定與對齊</h2>
+      <ul>
+        <li data-i18n="guide.s2a">畫面中央會出現區域 1、2、3 的檢測框。</li>
+        <li data-i18n="guide.s2b">移動位置：拖曳檢測框或取樣探針，或先聚焦再用方向鍵移動。區域模式可用 Shift + 方向鍵調整大小；精準取樣則是大步移動。</li>
+        <li data-i18n="guide.s2c">精準取樣：點擊或拖曳虛線探針，即可把十字準星放到想取樣的像素（含四個角落）；中央保持透明，標籤會顯示區域編號與即時取樣顏色。</li>
+        <li data-i18n="guide.s2d">縮放畫面：使用右上角 + / − 按鈕或滾輪縮放，放大後可拖曳背景平移。</li>
+      </ul>
+
+      <h2 data-i18n="guide.s3">3. 參數調整與控制</h2>
+      <ul>
+        <li data-i18n="guide.s3a">檢測模式：精準取樣（取 1px 單點）或區域平均色；切換時會自動重設基準值。</li>
+        <li data-i18n="guide.s3b">靈敏度：顏色變動百分比超過門檻（預設 4%）時觸發警報。</li>
+        <li data-i18n="guide.s3c">排程自動控制：設定每日開始與停止時間。瀏覽器要求點擊才能分享畫面，因此排程時間到時會提示你按下開始按鈕。</li>
+      </ul>
+
+      <h2 data-i18n="guide.s4">4. 自動記憶功能 (LocalStorage)</h2>
+      <ul>
+        <li data-i18n="guide.s4a">配色、印花、檢測模式、間隔、靈敏度、排程、各區域座標與開關狀態都會自動儲存，重新整理後還原。</li>
+      </ul>
+
+      <h2 data-i18n="guide.s5">5. 外觀風格與已儲存外觀 (Style Kit)</h2>
+      <ul>
+        <li data-i18n="guide.s5a">右上角 ⚙ 外觀面板可切換 10 種設計風格（含液態玻璃）、配色主題與背景印花。</li>
+        <li data-i18n="guide.s5b">可為目前外觀命名儲存、一鍵套用或刪除，並匯出 / 匯入 JSON 設定檔。</li>
+        <li data-i18n="guide.s5c">外觀使用獨立的 LocalStorage 鍵，不會影響監控設定與區域座標。</li>
+      </ul>
+
+      <h2 id="version-history" tabindex="-1" data-i18n="guide.history">版本歷史</h2>
+      <div class="version-history">
+        <section class="version-entry">
+          <h3><span>v2.9.3</span><span class="version-date">2026-11-25</span><span class="version-latest" data-i18n="history.latest">最新</span></h3>
+          <ul>
+            <li data-i18n="history.v293a">修正中間「開始分享監控畫面」被影片層覆蓋而無法點擊。</li>
+            <li data-i18n="history.v293b">新增自我測試與長時間監控健康狀態（最後取樣、停頓偵測、心跳紀錄）。</li>
+            <li data-i18n="history.v293c">精準取樣改用獨立座標，可指到畫面四個角落。</li>
+            <li data-i18n="history.v293d">修正切換檢測模式時未重設基準造成的誤警報。</li>
+            <li data-i18n="history.v293e">外觀面板改為跟隨觸發鈕定位，並新增版本歷史。</li>
+          </ul>
+        </section>
+        <section class="version-entry">
+          <h3><span>v2.9.2</span><span class="version-date">2026-11-24</span></h3>
+          <ul>
+            <li data-i18n="history.v292a">新增繁中／英文即時切換與液態玻璃等外觀風格。</li>
+            <li data-i18n="history.v292b">簡化介面並修正版面位移問題。</li>
+            <li data-i18n="history.v292c">十字準星改為固定大小，並加上即時取樣顏色標籤。</li>
+          </ul>
+        </section>
+        <section class="version-entry">
+          <h3><span>v2.9.1</span><span class="version-date">2026-11-24</span></h3>
+          <ul>
+            <li data-i18n="history.v291a">介面簡化前的檢查點版本。</li>
+          </ul>
+        </section>
+        <section class="version-entry">
+          <h3><span>v2.9.0</span><span class="version-date">2026-11-23</span></h3>
+          <ul>
+            <li data-i18n="history.v290a">多區域色彩監控器原始版本。</li>
+          </ul>
+        </section>
+      </div>
+
+      <button class="modal-close" type="button" autofocus onclick="toggleModal(false)" data-i18n="guide.close">我知道了</button>
+    </div>
+  </dialog>
+
+  <main>
+    <div class="video-container is-idle" id="video-wrapper">
+      <div class="zoom-controls">
+        <button class="zoom-btn" type="button" aria-label="縮小畫面" data-i18n-aria="video.zoomOut" onclick="adjustZoom(-0.5)"><span aria-hidden="true">-</span></button>
+        <span id="zoom-level" class="zoom-level">1.0x</span>
+        <button class="zoom-btn" type="button" aria-label="放大畫面" data-i18n-aria="video.zoomIn" onclick="adjustZoom(0.5)"><span aria-hidden="true">+</span></button>
+        <button class="zoom-btn" type="button" aria-label="重設縮放" data-i18n-aria="video.zoomReset" style="width:auto; padding:0 8px; font-size:0.74rem;" onclick="resetZoom()" data-i18n="video.reset">重設</button>
+      </div>
+
+      <div id="placeholder" class="placeholder-text empty-state">
+        <span class="empty-badge" aria-hidden="true">MON</span>
+        <strong class="empty-title" data-i18n="stage.title">尚未開始監控</strong>
+        <span class="empty-hint" data-i18n="stage.hint">選擇要監控的分頁或視窗，三個區域框就會出現在畫面上。</span>
+        <button class="btn btn-primary empty-cta" type="button" id="stage-start" data-i18n="btn.start">開始分享監控畫面</button>
+        <p class="empty-error" id="stage-error" role="alert" hidden></p>
+      </div>
+      
+      <div class="video-viewport" id="viewport">
+        <div class="zoom-stage" id="zoom-stage">
+          <video id="screen-video" autoplay playsinline muted></video>
+          
+          <div id="crop-box-1" class="crop-box box-zone-1 pixel-mode" tabindex="0" role="group" aria-label="區域 1 精準取樣：點擊或拖曳移動取樣點，方向鍵微調，Shift 加方向鍵大步移動" data-i18n-aria="zone.pointAria1">
+            <div class="box-label bg-zone-1" data-i18n="zone.1">區域 1</div>
+            <div class="crosshair-h"></div>
+            <div class="crosshair-v"></div>
+            <div class="crosshair-center-gap"></div>
+            <div class="point-tag"><span class="point-index">1</span><span class="point-swatch" aria-hidden="true"></span></div>
+            <div class="resize-handle handle-nw"></div>
+            <div class="resize-handle handle-ne"></div>
+            <div class="resize-handle handle-sw"></div>
+            <div class="resize-handle handle-se"></div>
+          </div>
+
+          <div id="crop-box-2" class="crop-box box-zone-2 pixel-mode paused-box" tabindex="0" role="group" aria-label="區域 2 精準取樣：點擊或拖曳移動取樣點，方向鍵微調，Shift 加方向鍵大步移動" data-i18n-aria="zone.pointAria2">
+            <div class="box-label bg-zone-2" data-i18n="zone.2">區域 2</div>
+            <div class="crosshair-h"></div>
+            <div class="crosshair-v"></div>
+            <div class="crosshair-center-gap"></div>
+            <div class="point-tag"><span class="point-index">2</span><span class="point-swatch" aria-hidden="true"></span></div>
+            <div class="resize-handle handle-nw"></div>
+            <div class="resize-handle handle-ne"></div>
+            <div class="resize-handle handle-sw"></div>
+            <div class="resize-handle handle-se"></div>
+          </div>
+
+          <div id="crop-box-3" class="crop-box box-zone-3 pixel-mode paused-box" tabindex="0" role="group" aria-label="區域 3 精準取樣：點擊或拖曳移動取樣點，方向鍵微調，Shift 加方向鍵大步移動" data-i18n-aria="zone.pointAria3">
+            <div class="box-label bg-zone-3" data-i18n="zone.3">區域 3</div>
+            <div class="crosshair-h"></div>
+            <div class="crosshair-v"></div>
+            <div class="crosshair-center-gap"></div>
+            <div class="point-tag"><span class="point-index">3</span><span class="point-swatch" aria-hidden="true"></span></div>
+            <div class="resize-handle handle-nw"></div>
+            <div class="resize-handle handle-ne"></div>
+            <div class="resize-handle handle-sw"></div>
+            <div class="resize-handle handle-se"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <h2 data-i18n="panel.controls">畫面控制</h2>
+        <button id="start-btn" class="btn btn-primary btn-lg" data-i18n="btn.start">開始分享監控畫面</button>
+        <div class="btn-row">
+          <button id="stop-btn" class="btn btn-secondary" type="button" disabled data-i18n="btn.stop">停止監控</button>
+          <button id="sound-test-btn" class="btn btn-secondary" type="button" data-i18n="btn.test">測試警報</button>
+        </div>
+
+        <div class="health-row" id="health-row" data-state="idle" role="status" aria-live="off">
+          <span class="health-dot" aria-hidden="true"></span>
+          <span id="health-text" data-i18n="health.waiting">尚未開始取樣</span>
+          <span id="health-age" class="health-age"></span>
+        </div>
+
+        <details class="fold" style="margin-top:10px;">
+          <summary>
+            <span data-i18n="sched.title">排程自動控制</span>
+            <span id="timer-status" class="count" role="status" aria-live="polite">未啟用</span>
+          </summary>
+          <div class="fold-body">
+            <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;">
+              <div class="panel-row" style="margin:0;">
+                <label for="start-target-time" data-i18n="sched.start">開始時間</label>
+                <input type="time" id="start-target-time" value="08:00" class="styled-input" onchange="saveOptions()">
+              </div>
+              <div class="panel-row" style="margin:0;">
+                <label for="stop-target-time" data-i18n="sched.stop">停止時間</label>
+                <input type="time" id="stop-target-time" value="18:00" class="styled-input" onchange="saveOptions()">
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:0.76rem; color:var(--subpanel-text);">
+              <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                <input type="checkbox" id="loop-timer-checkbox" style="accent-color: var(--highlight-color);" onchange="saveOptions()"> <span data-i18n="sched.loop">啟用每日循環</span>
+              </label>
+              <button id="timer-btn" class="step-btn" style="padding:4px 10px;" onclick="toggleAutoScheduleTime()">啟動排程</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="panel.zones">監控區域設定</h2>
+
+        <details class="fold" style="margin-bottom:10px;">
+          <summary data-i18n="advanced.title">進階設定</summary>
+          <div class="fold-body">
+            <div class="form-row" style="margin-bottom:8px;">
+              <label for="detect-mode" data-i18n="mode.label">檢測模式</label>
+              <select id="detect-mode" class="styled-select">
+                <option value="pixel" selected data-i18n="mode.pixel">精準取樣</option>
+                <option value="avg" data-i18n="mode.avg">區域平均色</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="interval-sec" data-i18n="mode.interval">檢測間隔 (秒)</label>
+              <input type="number" id="interval-sec" min="0.5" max="60" step="0.5" value="1" class="styled-input" style="width:68px;text-align:center;">
+            </div>
+
+            <div class="test-block">
+              <button id="self-test-btn" class="panel-btn" type="button" data-i18n="test.run">執行自我測試</button>
+              <p id="self-test-status" class="panel-hint" role="status" aria-live="polite">不用分享畫面，檢查取樣計算、門檻與警報流程。</p>
+              <ul id="self-test-results" class="test-results" hidden></ul>
+            </div>
+          </div>
+        </details>
+
+        <div class="zone-card">
+          <div class="zone-header">
+            <span class="zone-title"><span class="color-dot bg-zone-1"></span> <span data-i18n="zone.1">區域 1</span></span>
+            <button id="pause-btn-1" class="toggle-btn" type="button" aria-pressed="true" onclick="toggleZonePause(1)">監控中</button>
+          </div>
+          <div class="zone-body">
+            <div id="swatch-1" class="color-swatch"></div>
+            <div class="color-info">
+              <div><span data-i18n="zone.rgb">RGB</span>: <span id="rgb-1">---</span> · <span data-i18n="zone.delta">變動</span> <span id="delta-1">0%</span></div>
+              <div class="size-stepper">
+                <span data-i18n="zone.size">尺寸</span> <span id="size-1">--x--</span>
+                <button class="step-btn" type="button" aria-label="區域 1 縮小檢測框" data-i18n-aria="zone.smaller1" onclick="adjustBoxSize(1, -2, -2)"><span aria-hidden="true">−</span></button>
+                <button class="step-btn" type="button" aria-label="區域 1 放大檢測框" data-i18n-aria="zone.bigger1" onclick="adjustBoxSize(1, 2, 2)"><span aria-hidden="true">+</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="zone-card">
+          <div class="zone-header">
+            <span class="zone-title"><span class="color-dot bg-zone-2"></span> <span data-i18n="zone.2">區域 2</span></span>
+            <button id="pause-btn-2" class="toggle-btn paused" type="button" aria-pressed="false" onclick="toggleZonePause(2)">已關閉</button>
+          </div>
+          <div class="zone-body">
+            <div id="swatch-2" class="color-swatch"></div>
+            <div class="color-info">
+              <div><span data-i18n="zone.rgb">RGB</span>: <span id="rgb-2">---</span> · <span data-i18n="zone.delta">變動</span> <span id="delta-2">0%</span></div>
+              <div class="size-stepper">
+                <span data-i18n="zone.size">尺寸</span> <span id="size-2">--x--</span>
+                <button class="step-btn" type="button" aria-label="區域 2 縮小檢測框" data-i18n-aria="zone.smaller2" onclick="adjustBoxSize(2, -2, -2)"><span aria-hidden="true">−</span></button>
+                <button class="step-btn" type="button" aria-label="區域 2 放大檢測框" data-i18n-aria="zone.bigger2" onclick="adjustBoxSize(2, 2, 2)"><span aria-hidden="true">+</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="zone-card">
+          <div class="zone-header">
+            <span class="zone-title"><span class="color-dot bg-zone-3"></span> <span data-i18n="zone.3">區域 3</span></span>
+            <button id="pause-btn-3" class="toggle-btn paused" type="button" aria-pressed="false" onclick="toggleZonePause(3)">已關閉</button>
+          </div>
+          <div class="zone-body">
+            <div id="swatch-3" class="color-swatch"></div>
+            <div class="color-info">
+              <div><span data-i18n="zone.rgb">RGB</span>: <span id="rgb-3">---</span> · <span data-i18n="zone.delta">變動</span> <span id="delta-3">0%</span></div>
+              <div class="size-stepper">
+                <span data-i18n="zone.size">尺寸</span> <span id="size-3">--x--</span>
+                <button class="step-btn" type="button" aria-label="區域 3 縮小檢測框" data-i18n-aria="zone.smaller3" onclick="adjustBoxSize(3, -2, -2)"><span aria-hidden="true">−</span></button>
+                <button class="step-btn" type="button" aria-label="區域 3 放大檢測框" data-i18n-aria="zone.bigger3" onclick="adjustBoxSize(3, 2, 2)"><span aria-hidden="true">+</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <label for="sensitivity" style="font-size: 0.8rem; font-weight: 700; display: flex; justify-content: space-between; color: var(--headline-color); margin-bottom: 6px;">
+            <span data-i18n="zone.sensitivity">靈敏度</span>
+            <span id="sens-val" style="background: var(--subpanel-bg); color: var(--subpanel-text); border: 2px solid var(--stroke-color); padding: 1px 7px; border-radius: 5px; font-family: monospace;">4%</span>
+          </label>
+          <input type="range" id="sensitivity" min="1" max="50" value="4" style="width: 100%; accent-color: var(--highlight-color); cursor: pointer;" oninput="onSensitivityChange()">
+        </div>
+      </div>
+
+      <div class="card">
+        <details class="fold">
+          <summary>
+            <span data-i18n="log.title">系統紀錄</span>
+            <span class="count" id="log-count">0</span>
+          </summary>
+          <div class="fold-body">
+            <div id="log-box" class="log-box" role="log" aria-live="polite" aria-label="系統事件紀錄" data-i18n-aria="log.aria"></div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </main>
+
+  <canvas id="capture-canvas"></canvas>
+
+  <script>
+    /* ==================================================================
+       i18n — static UI text uses data-i18n; runtime strings use t(zh, en).
+       Chinese is captured from the markup once, so only English lives here.
+       ================================================================== */
+    (function () {
+      'use strict';
+      const LANG_KEY = 'job-monitor-v282-lang';
+      const EN = {
+        'app.title': 'Multi-Zone Color Monitor',
+        'header.settings': 'Looks',
+        'header.settingsAria': 'Looks settings',
+        'header.help': 'Help',
+        'version.open': 'v2.9.3 version history',
+
+        'health.waiting': 'No samples yet',
+
+        'test.run': 'Run self-test',
+        'test.running': 'Running…',
+        'test.hint': 'Checks sampling math, threshold and alarm pipeline without sharing the screen.',
+        'test.api': 'Screen capture API',
+        'test.pixels': 'Pixel sampling math',
+        'test.delta': 'Color delta calculation',
+        'test.threshold': 'Sensitivity threshold',
+        'test.alarm': 'Alarm pipeline available',
+        'test.pass': 'Pass',
+        'test.fail': 'Fail',
+
+        'panel.title': 'Appearance',
+        'panel.close': 'Close',
+        'panel.palette': 'Color theme',
+        'theme.purple': '■ Classic purple',
+        'theme.yellow': '■ Bright yellow',
+        'theme.coral': '■ Coral pink',
+        'theme.sky': '■ Sky blue',
+        'theme.green': '■ Soft green',
+        'theme.orange': '■ Tangerine',
+        'theme.lavender': '■ Lavender',
+        'theme.gray': '■ Gray',
+        'theme.custom': '◈ Custom color',
+        'panel.customColor': 'Custom accent color',
+        'panel.customHint': 'Choose “Custom color” to pick an accent.',
+        'panel.pattern': 'Background pattern',
+        'pattern.dots': '∷ Dots',
+        'pattern.grid': '⊞ Grid',
+        'pattern.diagonal': '▨ Diagonal',
+        'pattern.cross': '✦ Dual dots',
+        'pattern.checker': '▤ Checker',
+        'pattern.none': '□ Plain',
+        'panel.style': 'Design style',
+        'panel.styleAria': 'Switch design style',
+        'panel.aria': 'Appearance and storage settings',
+        'style.original': 'Original',
+        'style.glass': 'Glass',
+        'style.liquid': 'Liquid Glass',
+        'style.neumorph': 'Neumorphism',
+        'style.brutal': 'Brutalism',
+        'style.neubrutal': 'Dark brutalism',
+        'style.clay': 'Clay',
+        'style.editorial': 'Editorial',
+        'style.terminal': 'Terminal',
+        'style.aurora': 'Aurora',
+        'panel.current': 'Current look',
+        'panel.note': 'Palette and pattern are set above; the style is independent and saved with your named looks.',
+        'panel.storage': 'Saved looks',
+        'panel.remember': 'Remember my appearance',
+        'panel.presetPh': 'Name this look…',
+        'panel.presetAria': 'Name of the saved look',
+        'panel.save': 'Save',
+        'panel.export': 'Export JSON',
+        'panel.import': 'Import JSON',
+        'panel.foot': 'Stored separately · monitor settings untouched',
+        'panel.reset': 'Reset',
+
+        'guide.title': 'v2.9.3 user guide',
+        'guide.s1': '1. Start monitoring',
+        'guide.s1a': 'Click “Start screen share” in the control panel.',
+        'guide.s1b': 'In the browser picker, choose the tab, window or screen to watch (a window showing the status display works best).',
+        'guide.s2': '2. Place the zones',
+        'guide.s2a': 'Three detection boxes appear over the shared view.',
+        'guide.s2b': 'Move: drag a box, or focus it and use the arrow keys. Shift + arrows resizes in area mode; in precision mode it moves faster.',
+        'guide.s2c': 'Precision point: click or drag the dashed probe to drop the reticle on any pixel, including the screen corners. The tag shows the zone number and its live sampled color.',
+        'guide.s2d': 'Zoom with + / − or the scroll wheel; once zoomed, drag the background to pan.',
+        'guide.s3': '3. Tune the detection',
+        'guide.s3a': 'Detection mode: precision point (1 px) or area average color.',
+        'guide.s3b': 'Sensitivity: an alarm fires when the color change exceeds this threshold (default 4%).',
+        'guide.s3c': 'Schedule: set daily start and stop times. Browsers need a click to share the screen, so a scheduled start asks you to press the start button.',
+        'guide.s4': '4. Automatic memory (localStorage)',
+        'guide.s4a': 'Palette, pattern, detection mode, interval, sensitivity, schedule, zone positions and on/off states are saved automatically and restored on reload.',
+        'guide.s5': '5. Looks and saved presets',
+        'guide.s5a': 'The ⚙ Looks panel switches all 10 styles (including Liquid Glass), the color theme and the background pattern.',
+        'guide.s5b': 'Name and save a look, apply or delete it, or export / import looks as JSON.',
+        'guide.s5c': 'Looks use their own storage keys and never change the monitoring settings or zone positions.',
+        'guide.history': 'Version history',
+        'history.latest': 'Latest',
+        'history.v293a': 'Fixed the centered “Start screen share” button being covered by the video layer.',
+        'history.v293b': 'Added a self-test and long-run health status (last sample, stall detection, heartbeat log).',
+        'history.v293c': 'Precision point now uses an independent coordinate, so all four screen corners are reachable.',
+        'history.v293d': 'Fixed false alarms when switching detection modes by rebuilding the baseline.',
+        'history.v293e': 'The looks panel now opens next to its trigger; version history added.',
+        'history.v292a': 'Added live Chinese/English switching and styles such as Liquid Glass.',
+        'history.v292b': 'Simplified the interface and removed layout shift.',
+        'history.v292c': 'The crosshair became a fixed-size reticle with a live color tag.',
+        'history.v291a': 'Checkpoint before the interface simplification.',
+        'history.v290a': 'Original multi-zone color monitor release.',
+        'guide.close': 'Got it',
+
+        'video.zoomOut': 'Zoom out',
+        'video.zoomIn': 'Zoom in',
+        'video.zoomReset': 'Reset zoom',
+        'video.reset': 'Reset',
+        'video.placeholder': 'Click “Start screen share” on the right to begin.',
+        'stage.title': 'Monitoring not started',
+        'stage.hint': 'Pick the tab or window to watch, and three zone boxes appear over it.',
+
+        'zone.1': 'Zone 1',
+        'zone.2': 'Zone 2',
+        'zone.3': 'Zone 3',
+        'zone.rgb': 'RGB',
+        'zone.delta': 'Δ',
+        'zone.size': 'Size',
+        'zone.sensitivity': 'Sensitivity',
+        'zone.boxAria1': 'Zone 1 box: arrow keys move, Shift + arrows resize',
+        'zone.boxAria2': 'Zone 2 box: arrow keys move, Shift + arrows resize',
+        'zone.boxAria3': 'Zone 3 box: arrow keys move, Shift + arrows resize',
+        'zone.pointAria1': 'Zone 1 precision point: click or drag to place the sample, arrow keys nudge, Shift + arrows move faster',
+        'zone.pointAria2': 'Zone 2 precision point: click or drag to place the sample, arrow keys nudge, Shift + arrows move faster',
+        'zone.pointAria3': 'Zone 3 precision point: click or drag to place the sample, arrow keys nudge, Shift + arrows move faster',
+        'zone.smaller1': 'Shrink zone 1 box',
+        'zone.bigger1': 'Enlarge zone 1 box',
+        'zone.smaller2': 'Shrink zone 2 box',
+        'zone.bigger2': 'Enlarge zone 2 box',
+        'zone.smaller3': 'Shrink zone 3 box',
+        'zone.bigger3': 'Enlarge zone 3 box',
+
+        'panel.controls': 'Screen controls',
+        'btn.start': 'Start screen share',
+        'btn.stop': 'Stop',
+        'btn.test': 'Test alarm',
+        'sched.title': 'Auto schedule',
+        'sched.start': 'Start time',
+        'sched.stop': 'Stop time',
+        'sched.loop': 'Repeat daily',
+        'panel.zones': 'Monitoring zones',
+        'advanced.title': 'Advanced',
+        'mode.label': 'Detection mode',
+        'mode.pixel': 'Precision point',
+        'mode.avg': 'Area average',
+        'mode.interval': 'Interval (sec)',
+        'log.title': 'Event log',
+        'log.aria': 'System event log',
+        'alarm.dismiss': 'Dismiss alarm',
+      };
+
+      let lang = 'zh';
+      try { lang = localStorage.getItem(LANG_KEY) === 'en' ? 'en' : 'zh'; } catch (e) { /* storage blocked */ }
+
+      function capture(root) {
+        root.querySelectorAll('[data-i18n]').forEach((el) => {
+          if (el.dataset.zh === undefined) el.dataset.zh = el.textContent;
+        });
+        root.querySelectorAll('[data-i18n-ph]').forEach((el) => {
+          if (el.dataset.zhPh === undefined) el.dataset.zhPh = el.getAttribute('placeholder') || '';
+        });
+        root.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+          if (el.dataset.zhAria === undefined) el.dataset.zhAria = el.getAttribute('aria-label') || '';
+        });
+      }
+
+      function pick(key, fallback) {
+        return lang === 'en' && EN[key] != null ? EN[key] : fallback;
+      }
+
+      function apply(root) {
+        const scope = root || document;
+        scope.querySelectorAll('[data-i18n]').forEach((el) => {
+          el.textContent = pick(el.dataset.i18n, el.dataset.zh);
+        });
+        scope.querySelectorAll('[data-i18n-ph]').forEach((el) => {
+          el.setAttribute('placeholder', pick(el.dataset.i18nPh, el.dataset.zhPh));
+        });
+        scope.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+          el.setAttribute('aria-label', pick(el.dataset.i18nAria, el.dataset.zhAria));
+        });
+        document.documentElement.lang = lang === 'en' ? 'en' : 'zh-Hant-TW';
+        document.documentElement.dataset.lang = lang;
+        const btn = document.getElementById('lang-toggle');
+        if (btn) {
+          btn.textContent = lang === 'en' ? '中文' : 'EN';
+          btn.setAttribute('aria-label', lang === 'en' ? '切換成中文' : 'Switch to English');
+        }
+      }
+
+      window.t = (zh, en) => (lang === 'en' ? en : zh);
+      window.tKey = (key, fallback) => pick(key, fallback);
+      window.getLang = () => lang;
+      window.applyLang = (next) => {
+        lang = next === 'en' ? 'en' : 'zh';
+        try { localStorage.setItem(LANG_KEY, lang); } catch (e) { /* storage blocked */ }
+        apply();
+        window.dispatchEvent(new CustomEvent('langchange', { detail: lang }));
+      };
+
+      capture(document);
+      apply();
+
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('#lang-toggle')) window.applyLang(lang === 'en' ? 'zh' : 'en');
+      });
+    })();
+  </script>
+
+  <script>
+    const STORAGE_KEY_PREFIX = 'job-monitor-v282-';
+
+    const zones = [
+      { id: 1, relBox: { xPct: 0.1, yPct: 0.1, wPct: 0.04, hPct: 0.04 }, point: { xPct: 0.12, yPct: 0.12 }, baseline: null, paused: false },
+      { id: 2, relBox: { xPct: 0.1, yPct: 0.18, wPct: 0.04, hPct: 0.04 }, point: { xPct: 0.12, yPct: 0.2 }, baseline: null, paused: true },
+      { id: 3, relBox: { xPct: 0.1, yPct: 0.26, wPct: 0.04, hPct: 0.04 }, point: { xPct: 0.12, yPct: 0.28 }, baseline: null, paused: true }
+    ];
+
+    // The precision probe keeps its own coordinate so a single pixel can sit
+    // exactly on a screen corner, where a box clamped to the stage cannot go.
+    const PROBE_SIZE = 34;
+
+    function zoneCenter(zone) {
+      return {
+        xPct: zone.relBox.xPct + zone.relBox.wPct / 2,
+        yPct: zone.relBox.yPct + zone.relBox.hPct / 2
+      };
+    }
+
+    function clampPct(value) {
+      return Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
+    }
+
+    function saveOptions() {
+      const settings = {
+        theme: document.body.getAttribute('data-theme') || 'purple-dark',
+        pattern: document.body.getAttribute('data-pattern') || 'dots',
+        customColor: document.getElementById('custom-color-picker').value,
+        sensitivity: document.getElementById('sensitivity').value,
+        detectMode: document.getElementById('detect-mode').value,
+        intervalSec: document.getElementById('interval-sec').value,
+        startTime: document.getElementById('start-target-time').value,
+        stopTime: document.getElementById('stop-target-time').value,
+        loopTimer: document.getElementById('loop-timer-checkbox').checked,
+        zones: zones.map(z => ({
+          id: z.id,
+          relBox: z.relBox,
+          point: z.point,
+          paused: z.paused
+        }))
+      };
+      localStorage.setItem(STORAGE_KEY_PREFIX + 'settings', JSON.stringify(settings));
+    }
+
+    function loadOptions() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_PREFIX + 'settings');
+        if (!saved) return;
+        const settings = JSON.parse(saved);
+
+        if (settings.pattern) {
+          document.body.setAttribute('data-pattern', settings.pattern);
+          const pSelector = document.getElementById('pattern-selector');
+          if (pSelector) pSelector.value = settings.pattern;
+        }
+        if (settings.theme) {
+          document.body.setAttribute('data-theme', settings.theme);
+          const selector = document.getElementById('theme-selector');
+          if (selector) selector.value = settings.theme;
+          const picker = document.getElementById('custom-color-picker');
+          if (settings.theme === 'custom-theme') {
+            picker.style.display = 'block';
+          } else {
+            picker.style.display = 'none';
+          }
+        }
+        if (settings.customColor) {
+          document.getElementById('custom-color-picker').value = settings.customColor;
+          applyCustomColor(settings.customColor);
+        }
+        if (settings.sensitivity !== undefined) {
+          document.getElementById('sensitivity').value = settings.sensitivity;
+          document.getElementById('sens-val').textContent = settings.sensitivity + '%';
+        }
+        if (settings.detectMode) {
+          const modeSelect = document.getElementById('detect-mode');
+          modeSelect.value = settings.detectMode;
+          const mode = settings.detectMode;
+          zones.forEach(z => {
+            const boxEl = document.getElementById(`crop-box-${z.id}`);
+            if (boxEl) {
+              if (mode === 'pixel') boxEl.classList.add('pixel-mode');
+              else boxEl.classList.remove('pixel-mode');
+            }
+          });
+        }
+        if (settings.intervalSec) {
+          document.getElementById('interval-sec').value = settings.intervalSec;
+        }
+        if (settings.startTime) {
+          document.getElementById('start-target-time').value = settings.startTime;
+        }
+        if (settings.stopTime) {
+          document.getElementById('stop-target-time').value = settings.stopTime;
+        }
+        if (settings.loopTimer !== undefined) {
+          document.getElementById('loop-timer-checkbox').checked = settings.loopTimer;
+        }
+        if (settings.zones && Array.isArray(settings.zones)) {
+          settings.zones.forEach(savedZone => {
+            const z = zones.find(item => item.id === savedZone.id);
+            if (z) {
+              if (savedZone.relBox) z.relBox = savedZone.relBox;
+              if (savedZone.point && Number.isFinite(savedZone.point.xPct) && Number.isFinite(savedZone.point.yPct)) {
+                z.point = { xPct: clampPct(savedZone.point.xPct), yPct: clampPct(savedZone.point.yPct) };
+              } else {
+                // Older saves only stored the box, so derive the probe from its center.
+                z.point = zoneCenter(z);
+              }
+              if (savedZone.paused !== undefined) {
+                z.paused = savedZone.paused;
+                const btn = document.getElementById(`pause-btn-${z.id}`);
+                const cropBox = document.getElementById(`crop-box-${z.id}`);
+                if (btn && cropBox) {
+                  btn.setAttribute('aria-pressed', String(!z.paused));
+                  if (z.paused) {
+                    btn.textContent = t('已關閉', 'Off');
+                    btn.classList.add('paused');
+                    cropBox.classList.add('paused-box');
+                  } else {
+                    btn.textContent = t('監控中', 'Live');
+                    btn.classList.remove('paused');
+                    cropBox.classList.remove('paused-box');
+                  }
+                }
+              }
+            }
+          });
+        }
+      } catch (e) {
+        console.error("載入 LocalStorage 失敗:", e);
+      }
+    }
+
+    function changePattern(patternName) {
+      document.body.setAttribute('data-pattern', patternName);
+      saveOptions();
+      log(t(`已切換背景印花樣式至: ${patternName}`, `Background pattern: ${patternName}`));
+    }
+
+    function changeTheme(themeName) {
+      document.body.setAttribute('data-theme', themeName);
+      const picker = document.getElementById('custom-color-picker');
+      if (themeName === 'custom-theme') {
+        picker.style.display = 'block';
+        applyCustomColor(picker.value);
+      } else {
+        picker.style.display = 'none';
+      }
+      saveOptions();
+      log(t(`已切換配色主題至: ${themeName}`, `Color theme: ${themeName}`));
+    }
+
+    function applyCustomColor(colorHex) {
+      document.documentElement.style.setProperty('--custom-accent', colorHex);
+      // calculate hover color
+      document.documentElement.style.setProperty('--custom-accent-hover', adjustColorBrightness(colorHex, -20));
+    }
+
+    function updateCustomColor(colorHex) {
+      applyCustomColor(colorHex);
+      saveOptions();
+      log(t(`已更新自定主色調: ${colorHex}`, `Custom accent: ${colorHex}`));
+    }
+
+    function adjustColorBrightness(hex, percent) {
+      const num = parseInt(hex.replace("#", ""), 16);
+      const amt = Math.round(2.55 * percent);
+      const R = (num >> 16) + amt;
+      const G = (num >> 8 & 0x00FF) + amt;
+      const B = (num & 0x0000FF) + amt;
+      return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255)).toString(16).slice(1);
+    }
+
+    function onSensitivityChange() {
+      const val = document.getElementById('sensitivity').value;
+      document.getElementById('sens-val').textContent = val + '%';
+      saveOptions();
+    }
+
+    // 初始化載入
+    loadOptions();
+
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const soundTestBtn = document.getElementById('sound-test-btn');
+    const video = document.getElementById('screen-video');
+    const zoomStage = document.getElementById('zoom-stage');
+    const viewport = document.getElementById('viewport');
+    const placeholder = document.getElementById('placeholder');
+    const alarmBanner = document.getElementById('alarm-banner');
+    const alarmBannerText = document.getElementById('alarm-banner-text');
+    const srAlerts = document.getElementById('sr-alerts');
+    const canvas = document.getElementById('capture-canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    
+    const sensitivityInput = document.getElementById('sensitivity');
+    const sensVal = document.getElementById('sens-val');
+    const detectModeSelect = document.getElementById('detect-mode');
+    const intervalSecInput = document.getElementById('interval-sec');
+    const logBox = document.getElementById('log-box');
+    const logCount = document.getElementById('log-count');
+    const systemStatus = document.getElementById('system-status');
+    const zoomLevelEl = document.getElementById('zoom-level');
+    const infoModal = document.getElementById('info-modal');
+    const videoWrapper = document.getElementById('video-wrapper');
+    const healthRow = document.getElementById('health-row');
+    const healthText = document.getElementById('health-text');
+    const healthAge = document.getElementById('health-age');
+    const stageError = document.getElementById('stage-error');
+    const selfTestBtn = document.getElementById('self-test-btn');
+    const selfTestStatus = document.getElementById('self-test-status');
+    const selfTestResults = document.getElementById('self-test-results');
+
+    let lastSampleAt = 0;
+    let monitorStartedAt = 0;
+    let sampleCount = 0;
+    let errorCount = 0;
+    let lastHeartbeatAt = 0;
+    let stallLogged = false;
+    let healthTimer = null;
+    let selfTestSummary = null;
+    let selfTestChecks = null;
+
+    // A mode switch samples a completely different pixel set, so old baselines
+    // are meaningless. Reset them and ignore alarm thresholds for a short grace
+    // period while the new baseline settles.
+    let rebaselineUntil = 0;
+
+    function resetBaselinesForMode() {
+      zones.forEach(z => { z.baseline = null; });
+      rebaselineUntil = performance.now() + 1500;
+    }
+
+    // Keep the overlay affordance in sync with the sampling mode. Previously
+    // pixel-mode was only applied while loading, so switching modes left a
+    // stale reticle and stale keyboard instructions.
+    function syncDetectMode() {
+      const isPixel = detectModeSelect.value === 'pixel';
+      zones.forEach(z => {
+        const boxEl = document.getElementById(`crop-box-${z.id}`);
+        if (!boxEl) return;
+        boxEl.classList.toggle('pixel-mode', isPixel);
+        const zh = isPixel
+          ? `區域 ${z.id} 精準取樣：點擊或拖曳移動取樣點，方向鍵微調，Shift 加方向鍵大步移動`
+          : `區域 ${z.id} 檢測框：方向鍵移動，Shift 加方向鍵調整大小`;
+        const key = isPixel ? `zone.pointAria${z.id}` : `zone.boxAria${z.id}`;
+        boxEl.dataset.i18nAria = key;
+        boxEl.dataset.zhAria = zh;
+        boxEl.setAttribute('aria-label', window.tKey(key, zh));
+      });
+    }
+    syncDetectMode();
+    detectModeSelect.addEventListener('change', () => {
+      syncDetectMode();
+      resetBaselinesForMode();
+      zones.forEach(z => {
+        if (detectModeSelect.value === 'pixel') z.point = z.point || zoneCenter(z);
+        updateBoxDOM(z);
+      });
+      const label = detectModeSelect.value === 'pixel'
+        ? t('精準取樣', 'Precision point')
+        : t('區域平均色', 'Area average');
+      log(t(`[MODE] 檢測模式切換為「${label}」，已重設所有區域基準值`,
+        `[MODE] Detection mode switched to “${label}” — baselines reset`));
+      saveOptions();
+    });
+
+    const startTargetTimeInput = document.getElementById('start-target-time');
+    const stopTargetTimeInput = document.getElementById('stop-target-time');
+    const loopTimerCheckbox = document.getElementById('loop-timer-checkbox');
+    const timerStatusEl = document.getElementById('timer-status');
+    const timerBtn = document.getElementById('timer-btn');
+
+    let stream = null;
+    let monitorInterval = null;
+    let alarmTimer = null;
+    let audioCtx = null;
+    let stopping = false;
+    let resizeDir = null;
+    let scheduleTimer = null;
+    let scheduleActive = false;
+
+    let zoomScale = 1.0;
+    let panX = 0;
+    let panY = 0;
+    let isPanning = false;
+    let panStartX = 0, panStartY = 0;
+
+    const MIN_BOX_SIZE = 5;
+
+    let activeZoneId = null;
+    let isDragging = false;
+    let isResizing = false;
+    let startX, startY, startAbsBox;
+    let dragMetrics = null;
+
+    function log(msg) {
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement('div');
+      line.textContent = `[${time}] ${msg}`;
+      logBox.append(line);
+      // Keep the log bounded so long monitoring sessions do not grow forever.
+      while (logBox.childElementCount > 200) logBox.firstElementChild.remove();
+      if (logCount) logCount.textContent = String(logBox.childElementCount);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function toggleModal(show) {
+      if (!infoModal) return;
+      if (show) {
+        // Close the appearance popover first so the dialog is the only layer.
+        const panel = document.getElementById('themePanel');
+        if (panel && !panel.hidden) {
+          panel.hidden = true;
+          document.getElementById('openStylePanel').setAttribute('aria-expanded', 'false');
+        }
+        if (!infoModal.open) infoModal.showModal();
+      } else if (infoModal.open) {
+        infoModal.close();
+      }
+    }
+
+    // Fallback for browsers without `closedby` support (notably Safari):
+    // `closedby="any"` gives light-dismiss declaratively in Chrome/Firefox.
+    // A click whose target is the dialog itself means the backdrop was hit.
+    if (!('closedBy' in HTMLDialogElement.prototype)) {
+      infoModal.addEventListener('click', (event) => {
+        if (event.target !== infoModal) return;
+        const rect = infoModal.getBoundingClientRect();
+        const isContent = (
+          rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX && event.clientX <= rect.left + rect.width
+        );
+        if (!isContent) infoModal.close();
+      });
+    }
+
+    function announce(message) {
+      if (!srAlerts) return;
+      srAlerts.textContent = '';
+      // Re-set on the next frame so repeated identical messages are re-announced.
+      requestAnimationFrame(() => { srAlerts.textContent = message; });
+    }
+
+    function applyTransform() {
+      zoomStage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomScale})`;
+      zoomLevelEl.textContent = zoomScale.toFixed(1) + 'x';
+    }
+
+    function adjustZoom(delta) {
+      zoomScale = Math.max(1.0, Math.min(8.0, zoomScale + delta));
+      if (zoomScale === 1.0) { panX = 0; panY = 0; }
+      applyTransform();
+    }
+
+    function resetZoom() {
+      zoomScale = 1.0;
+      panX = 0;
+      panY = 0;
+      applyTransform();
+    }
+
+    viewport.addEventListener('wheel', (e) => {
+      if (zoomScale === 1.0 && e.deltaY > 0) return; // let the page scroll at 1x
+      e.preventDefault();
+      adjustZoom(e.deltaY < 0 ? 0.2 : -0.2);
+    }, { passive: false });
+
+    viewport.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      if (e.target.closest('.crop-box') || zoomScale === 1.0) return;
+      isPanning = true;
+      panStartX = e.clientX - panX;
+      panStartY = e.clientY - panY;
+      viewport.setPointerCapture(e.pointerId);
+      viewport.style.cursor = 'grabbing';
+    });
+
+    viewport.addEventListener('pointermove', (e) => {
+      if (!isPanning) return;
+      panX = e.clientX - panStartX;
+      panY = e.clientY - panStartY;
+      applyTransform();
+    });
+
+    function endPan(e) {
+      if (!isPanning) return;
+      isPanning = false;
+      viewport.style.cursor = 'default';
+      if (e && e.pointerId !== undefined && viewport.hasPointerCapture(e.pointerId)) {
+        viewport.releasePointerCapture(e.pointerId);
+      }
+    }
+    viewport.addEventListener('pointerup', endPan);
+    viewport.addEventListener('pointercancel', endPan);
+
+    function startAlarmSound(isTest) {
+      if (alarmTimer) return;
+      alarmBannerText.textContent = isTest
+        ? t('[TEST] 測試警報音效中…按「解除警報」停止', '[TEST] Alarm test running… press “Dismiss alarm” to stop')
+        : t('[ALERT] 偵測到 狀態顏色變更！警報響起中...', '[ALERT] Color change detected — alarm active…');
+      alarmBanner.style.display = 'flex';
+      announce(alarmBannerText.textContent);
+
+      const playBeep = () => {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+          const now = audioCtx.currentTime;
+
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.setValueAtTime(1200, now + 0.15);
+
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } catch (e) {
+          console.error(e);
+        }
+      };
+
+      playBeep();
+      alarmTimer = setInterval(playBeep, 600);
+    }
+
+    function stopAlarmSound(fromUser) {
+      if (alarmTimer) {
+        clearInterval(alarmTimer);
+        alarmTimer = null;
+      }
+      alarmBanner.style.display = 'none';
+      if (fromUser) log(t('使用者已暫停警報音效', 'Alarm dismissed by user'));
+    }
+
+    soundTestBtn.addEventListener('click', () => {
+      startAlarmSound(true);
+      log(t('觸發測試警報（需手動解除）', 'Test alarm triggered (dismiss manually)'));
+    });
+
+    function toggleZonePause(id) {
+      const zone = zones.find(z => z.id === id);
+      const btn = document.getElementById(`pause-btn-${id}`);
+      const cropBox = document.getElementById(`crop-box-${id}`);
+
+      zone.paused = !zone.paused;
+      zone.baseline = null;
+      btn.setAttribute('aria-pressed', String(!zone.paused));
+
+      if (zone.paused) {
+        btn.textContent = t('已關閉', 'Off');
+        btn.classList.add('paused');
+        cropBox.classList.add('paused-box');
+        log(t(`區域 ${id} 已關閉監控`, `Zone ${id} monitoring off`));
+      } else {
+        btn.textContent = t('監控中', 'Live');
+        btn.classList.remove('paused');
+        cropBox.classList.remove('paused-box');
+        log(t(`區域 ${id} 已開啟監控`, `Zone ${id} monitoring on`));
+      }
+      saveOptions();
+    }
+
+    function adjustBoxSize(id, dw, dh) {
+      const zone = zones.find(z => z.id === id);
+      const parentW = zoomStage.clientWidth;
+      const parentH = zoomStage.clientHeight;
+      if (!parentW || !parentH) return;
+
+      let curW = zone.relBox.wPct * parentW;
+      let newSize = Math.max(MIN_BOX_SIZE, curW + dw);
+
+      zone.relBox.wPct = newSize / parentW;
+      zone.relBox.hPct = newSize / parentH;
+      zone.point = zoneCenter(zone);
+
+      zone.baseline = null;
+      updateBoxDOM(zone);
+      saveOptions();
+    }
+
+    function toggleAutoScheduleTime() {
+      if (scheduleActive) {
+        stopSchedule(t('未啟用', 'Off'));
+        log(t('已取消自動排程設定', 'Auto schedule cancelled'));
+        return;
+      }
+
+      const startTargetTime = startTargetTimeInput.value;
+      const stopTargetTime = stopTargetTimeInput.value;
+
+      if (!startTargetTime || !stopTargetTime) {
+        const msg = t('請設定完整的開始與停止時間', 'Set both a start and a stop time');
+        timerStatusEl.textContent = msg;
+        announce(msg);
+        const target = startTargetTime ? stopTargetTimeInput : startTargetTimeInput;
+        const fold = target.closest('details');
+        if (fold) fold.open = true;
+        target.focus();
+        return;
+      }
+
+      if (startTargetTime === stopTargetTime) {
+        const msg = t('開始與停止時間不可相同', 'Start and stop times must differ');
+        timerStatusEl.textContent = msg;
+        announce(msg);
+        return;
+      }
+
+      scheduleActive = true;
+      timerBtn.textContent = t('取消', 'Cancel');
+      log(t(`已啟動自動排程：每日 ${startTargetTime} 開始，${stopTargetTime} 停止`,
+        `Schedule on: daily ${startTargetTime}–${stopTargetTime}`));
+      scheduleNextRun();
+    }
+
+    function parseClock(value) {
+      const parts = value.split(':').map(Number);
+      return { h: parts[0] || 0, m: parts[1] || 0 };
+    }
+
+    function msUntilClock(h, m) {
+      const now = new Date();
+      const next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+      if (next.getTime() <= now.getTime()) next.setDate(next.getDate() + 1);
+      return next.getTime() - now.getTime();
+    }
+
+    function formatClock(h, m) {
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function stopSchedule(message) {
+      scheduleActive = false;
+      clearTimeout(scheduleTimer);
+      scheduleTimer = null;
+      timerStatusEl.textContent = message || t('未啟用', 'Off');
+      timerBtn.textContent = t('啟動排程', 'Start schedule');
+    }
+
+    function scheduleNextRun() {
+      clearTimeout(scheduleTimer);
+      scheduleTimer = null;
+      if (!scheduleActive) return;
+
+      const start = parseClock(startTargetTimeInput.value);
+      const stop = parseClock(stopTargetTimeInput.value);
+      const startIn = msUntilClock(start.h, start.m);
+      const stopIn = msUntilClock(stop.h, stop.m);
+      const startFirst = startIn <= stopIn;
+      const delay = startFirst ? startIn : stopIn;
+      const nextAt = startFirst ? start : stop;
+
+      timerStatusEl.textContent = startFirst
+        ? t(`排程中 · 下次開始 ${formatClock(nextAt.h, nextAt.m)}`, `Scheduled · starts ${formatClock(nextAt.h, nextAt.m)}`)
+        : t(`排程中 · 下次停止 ${formatClock(nextAt.h, nextAt.m)}`, `Scheduled · stops ${formatClock(nextAt.h, nextAt.m)}`);
+
+      // A single timeout per event is far more reliable than comparing HH:MM:SS
+      // inside a 1 s interval, which background tabs throttle and can miss.
+      scheduleTimer = setTimeout(async () => {
+        if (startFirst) {
+          await autoStartFromSchedule();
+        } else {
+          stopMonitoring();
+          if (!loopTimerCheckbox.checked) {
+            stopSchedule(t('排程已結束', 'Schedule finished'));
+            return;
+          }
+        }
+        scheduleNextRun();
+      }, Math.max(0, delay));
+    }
+
+    async function autoStartFromSchedule() {
+      log(t(`[TIMER] 到達指定開始時間 (${startTargetTimeInput.value})，嘗試自動啟動畫面監控...`,
+        `[TIMER] Reached ${startTargetTimeInput.value}, trying to start screen monitoring…`));
+      if (stream) return;
+      try {
+        await startCapture();
+      } catch (err) {
+        // getDisplayMedia requires a user gesture; a timer callback has none.
+        log(t('自動啟動失敗：瀏覽器要求使用者互動才能分享畫面。請按「開始分享監控畫面」。',
+          'Auto-start failed: the browser needs a user gesture to share the screen. Press “Start screen share”.'));
+        announce(t('排程時間到，但需要你按一下「開始分享監控畫面」才能開始。',
+          'The schedule is due, but press “Start screen share” to begin.'));
+        startBtn.classList.add('needs-attention');
+        startBtn.focus();
+      }
+    }
+
+    [startTargetTimeInput, stopTargetTimeInput, loopTimerCheckbox].forEach((el) => {
+      el.addEventListener('change', () => {
+        if (scheduleActive) scheduleNextRun();
+      });
+    });
+
+    async function startCapture() {
+      if (stream) return;
+      stream = await navigator.mediaDevices.getDisplayMedia({ video: { cursor: "always" }, audio: false });
+      video.srcObject = stream;
+      placeholder.style.display = 'none';
+      videoWrapper.classList.remove('is-idle');
+      if (stageError) stageError.hidden = true;
+      startBtn.classList.remove('needs-attention');
+
+      video.onloadedmetadata = () => {
+        updateStageSize();
+        zones.forEach(z => {
+          document.getElementById(`crop-box-${z.id}`).style.display = 'block';
+          z.baseline = null;
+          updateBoxDOM(z);
+        });
+      };
+
+      monitorStartedAt = Date.now();
+      lastHeartbeatAt = monitorStartedAt;
+      lastSampleAt = 0;
+      sampleCount = 0;
+      errorCount = 0;
+      stallLogged = false;
+
+      systemStatus.className = 'status-badge badge-on';
+      systemStatus.dataset.state = 'on';
+      systemStatus.textContent = t('監控中', 'Live');
+      log(t('開始分享畫面', 'Screen sharing started'));
+      startMonitoring();
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      stream.getVideoTracks()[0].addEventListener('ended', () => stopMonitoring());
+    }
+
+    const startAction = async () => {
+      try {
+        await startCapture();
+      } catch (err) {
+        const message = t('無法開始分享畫面：', 'Could not start screen sharing: ') + (err && err.message ? err.message : String(err));
+        log(t('擷取失敗: ', 'Capture failed: ') + message);
+        announce(message);
+        if (stageError) {
+          stageError.textContent = message;
+          stageError.hidden = false;
+        }
+      }
+    };
+    startBtn.addEventListener('click', startAction);
+    const stageStart = document.getElementById('stage-start');
+    if (stageStart) stageStart.addEventListener('click', startAction);
+
+    stopBtn.addEventListener('click', () => stopMonitoring());
+
+    function updateStageSize() {
+      if (!video.videoWidth || !video.videoHeight) return;
+      const containerW = viewport.clientWidth;
+      const containerH = viewport.clientHeight;
+      const videoRatio = video.videoWidth / video.videoHeight;
+      const containerRatio = containerW / containerH;
+
+      let renderW, renderH;
+      if (containerRatio > videoRatio) {
+        renderH = containerH;
+        renderW = containerH * videoRatio;
+      } else {
+        renderW = containerW;
+        renderH = containerW / videoRatio;
+      }
+
+      zoomStage.style.width = renderW + 'px';
+      zoomStage.style.height = renderH + 'px';
+    }
+
+    function updateBoxDOM(zone) {
+      const parentW = zoomStage.clientWidth || 600;
+      const parentH = zoomStage.clientHeight || 400;
+
+      const el = document.getElementById(`crop-box-${zone.id}`);
+      const sizeEl = document.getElementById(`size-${zone.id}`);
+
+      if (detectModeSelect.value === 'pixel') {
+        if (el) {
+          const size = PROBE_SIZE + 'px';
+          if (el.style.width !== size) el.style.width = size;
+          if (el.style.height !== size) el.style.height = size;
+        }
+        placeProbe(zone);
+        return;
+      }
+
+      const absW = Math.round(zone.relBox.wPct * parentW);
+      const absH = Math.round(zone.relBox.hPct * parentH);
+
+      if (el) {
+        el.style.left = (zone.relBox.xPct * parentW) + 'px';
+        el.style.top = (zone.relBox.yPct * parentH) + 'px';
+        el.style.width = absW + 'px';
+        el.style.height = absH + 'px';
+        el.classList.remove('tag-below', 'tag-left');
+      }
+
+      if (sizeEl) sizeEl.textContent = `${absW}x${absH}`;
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateStageSize();
+      zones.forEach(z => updateBoxDOM(z));
+    });
+    resizeObserver.observe(viewport);
+
+    // 啟動時先更新一次 DOM 框位置（依據載入的百分比）
+    setTimeout(() => {
+      updateStageSize();
+      zones.forEach(z => updateBoxDOM(z));
+    }, 100);
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function readStageMetrics() {
+      const rect = zoomStage.getBoundingClientRect();
+      return {
+        w: zoomStage.clientWidth || 1,
+        h: zoomStage.clientHeight || 1,
+        left: rect.left,
+        top: rect.top,
+        scale: zoomScale || 1
+      };
+    }
+
+    function stagePointFromEvent(e, metrics) {
+      const m = metrics || readStageMetrics();
+      return {
+        xPct: clampPct((e.clientX - m.left) / m.scale / m.w),
+        yPct: clampPct((e.clientY - m.top) / m.scale / m.h)
+      };
+    }
+
+    // Writing probe styles is cheap; re-reading layout on every pointermove is
+    // not. placeProbe uses metrics captured at pointerdown while dragging.
+    function placeProbe(zone, metrics) {
+      const m = metrics || readStageMetrics();
+      const pt = zone.point || zoneCenter(zone);
+      const px = clampPct(pt.xPct) * m.w;
+      const py = clampPct(pt.yPct) * m.h;
+      const el = document.getElementById(`crop-box-${zone.id}`);
+      if (el) {
+        el.style.left = (px - PROBE_SIZE / 2) + 'px';
+        el.style.top = (py - PROBE_SIZE / 2) + 'px';
+        el.classList.toggle('tag-below', py < 46);
+        el.classList.toggle('tag-left', px > m.w - 96);
+      }
+      const sizeEl = document.getElementById(`size-${zone.id}`);
+      if (sizeEl) sizeEl.textContent = '1x1';
+    }
+
+    function moveActiveBox(e) {
+      if (!activeZoneId) return;
+      const zone = zones.find(z => z.id === activeZoneId);
+      if (!zone) return;
+      const parentW = zoomStage.clientWidth;
+      const parentH = zoomStage.clientHeight;
+      if (!parentW || !parentH) return;
+
+      if (detectModeSelect.value === 'pixel') {
+        zone.point = stagePointFromEvent(e, dragMetrics);
+        zone.baseline = null;
+        placeProbe(zone, dragMetrics);
+        return;
+      }
+
+      const dx = (e.clientX - startX) / zoomScale;
+      const dy = (e.clientY - startY) / zoomScale;
+
+      let left = startAbsBox.left;
+      let top = startAbsBox.top;
+      let width = startAbsBox.width;
+      let height = startAbsBox.height;
+
+      if (isDragging) {
+        left = clamp(left + dx, 0, parentW - width);
+        top = clamp(top + dy, 0, parentH - height);
+      } else if (isResizing && resizeDir) {
+        const right = left + width;
+        const bottom = top + height;
+
+        if (resizeDir.includes('w')) {
+          left = clamp(left + dx, 0, right - MIN_BOX_SIZE);
+          width = right - left;
+        }
+        if (resizeDir.includes('e')) {
+          width = clamp(width + dx, MIN_BOX_SIZE, parentW - left);
+        }
+        if (resizeDir.includes('n')) {
+          top = clamp(top + dy, 0, bottom - MIN_BOX_SIZE);
+          height = bottom - top;
+        }
+        if (resizeDir.includes('s')) {
+          height = clamp(height + dy, MIN_BOX_SIZE, parentH - top);
+        }
+      }
+
+      zone.relBox = {
+        xPct: left / parentW,
+        yPct: top / parentH,
+        wPct: width / parentW,
+        hPct: height / parentH
+      };
+      // Something moved, so a later switch to precision mode should follow it.
+      zone.point = zoneCenter(zone);
+
+      zone.baseline = null;
+      updateBoxDOM(zone);
+    }
+
+    zones.forEach(zone => {
+      const el = document.getElementById(`crop-box-${zone.id}`);
+
+      el.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        activeZoneId = zone.id;
+        const parentW = zoomStage.clientWidth;
+        const parentH = zoomStage.clientHeight;
+
+        startAbsBox = {
+          left: zone.relBox.xPct * parentW,
+          top: zone.relBox.yPct * parentH,
+          width: zone.relBox.wPct * parentW,
+          height: zone.relBox.hPct * parentH
+        };
+
+        // Precision mode: one click/tap places the probe at the pointer, then
+        // dragging continues from there. Convert client pixels back to stage
+        // pixels so this stays accurate while zoomed or panned. The point is
+        // stored separately, so corners are reachable exactly.
+        if (detectModeSelect.value === 'pixel') {
+          dragMetrics = readStageMetrics();
+          zone.point = stagePointFromEvent(e, dragMetrics);
+          zone.baseline = null;
+          placeProbe(zone, dragMetrics);
+          document.body.classList.add('dragging-probe');
+        }
+
+        const handle = e.target.closest('.resize-handle');
+        if (handle) {
+          isResizing = true;
+          const match = handle.className.match(/handle-(nw|ne|sw|se)/);
+          resizeDir = match ? match[1] : 'se';
+        } else {
+          isDragging = true;
+          resizeDir = null;
+        }
+
+        startX = e.clientX;
+        startY = e.clientY;
+        el.setPointerCapture(e.pointerId);
+        e.stopPropagation();
+      });
+
+      el.addEventListener('pointermove', moveActiveBox);
+
+      function endZoneDrag(e) {
+        if (activeZoneId !== zone.id) return;
+        if (isDragging || isResizing) {
+          zone.baseline = null;
+          isDragging = false;
+          isResizing = false;
+          resizeDir = null;
+          activeZoneId = null;
+          dragMetrics = null;
+          document.body.classList.remove('dragging-probe');
+          saveOptions();
+        }
+        if (e && e.pointerId !== undefined && el.hasPointerCapture(e.pointerId)) {
+          el.releasePointerCapture(e.pointerId);
+        }
+      }
+      el.addEventListener('pointerup', endZoneDrag);
+      el.addEventListener('pointercancel', endZoneDrag);
+
+      // Keyboard parity for the mouse/pointer drag and resize.
+      el.addEventListener('keydown', (e) => {
+        const step = e.shiftKey ? 10 : 1;
+        let dx = 0;
+        let dy = 0;
+        if (e.key === 'ArrowLeft') dx = -step;
+        else if (e.key === 'ArrowRight') dx = step;
+        else if (e.key === 'ArrowUp') dy = -step;
+        else if (e.key === 'ArrowDown') dy = step;
+        else return;
+        e.preventDefault();
+
+        const parentW = zoomStage.clientWidth;
+        const parentH = zoomStage.clientHeight;
+        if (!parentW || !parentH) return;
+
+        if (e.shiftKey && detectModeSelect.value !== 'pixel') {
+          zone.relBox.wPct = clamp(zone.relBox.wPct + dx / parentW, MIN_BOX_SIZE / parentW, 1);
+          zone.relBox.hPct = clamp(zone.relBox.hPct + dy / parentH, MIN_BOX_SIZE / parentH, 1);
+        } else if (detectModeSelect.value === 'pixel') {
+          zone.point = {
+            xPct: clampPct(zone.point.xPct + dx / parentW),
+            yPct: clampPct(zone.point.yPct + dy / parentH)
+          };
+        } else {
+          zone.relBox.xPct = clamp(zone.relBox.xPct + dx / parentW, 0, 1 - zone.relBox.wPct);
+          zone.relBox.yPct = clamp(zone.relBox.yPct + dy / parentH, 0, 1 - zone.relBox.hPct);
+        }
+
+        if (detectModeSelect.value !== 'pixel') zone.point = zoneCenter(zone);
+
+        zone.baseline = null;
+        updateBoxDOM(zone);
+        saveOptions();
+        announce(t(`區域 ${zone.id} 已移動`, `Zone ${zone.id} moved`));
+      });
+    });
+
+    intervalSecInput.addEventListener('change', () => {
+      log(t(`檢測間隔已變更為: ${intervalSecInput.value} 秒`, `Interval set to ${intervalSecInput.value}s`));
+      saveOptions();
+      if (monitorInterval) startMonitoring();
+    });
+
+    function startMonitoring() {
+      if (monitorInterval) clearInterval(monitorInterval);
+      const intervalMs = Math.max(500, parseFloat(intervalSecInput.value) * 1000);
+      monitorInterval = setInterval(checkColors, intervalMs);
+    }
+
+    function stopMonitoring() {
+      if (stopping) return;
+      stopping = true;
+      try {
+        const wasActive = Boolean(stream) || Boolean(monitorInterval);
+        if (monitorInterval) clearInterval(monitorInterval);
+        monitorInterval = null;
+        stopAlarmSound(false);
+
+        // Always release the capture, even when this runs from a timer or a
+        // track that ended on its own, so the screen is never left shared.
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+          stream = null;
+        }
+        video.srcObject = null;
+
+        zones.forEach(z => {
+          document.getElementById(`crop-box-${z.id}`).style.display = 'none';
+        });
+        placeholder.style.display = '';
+        videoWrapper.classList.add('is-idle');
+        if (stageError) stageError.hidden = true;
+        systemStatus.className = 'status-badge badge-off';
+        systemStatus.dataset.state = 'off';
+        systemStatus.textContent = t('已停止', 'Stopped');
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        monitorStartedAt = 0;
+        lastSampleAt = 0;
+        updateHealth();
+        if (wasActive) log(t('監控已結束', 'Monitoring stopped'));
+      } finally {
+        stopping = false;
+      }
+    }
+
+    function colorDelta(a, b) {
+      return Math.round(
+        (Math.abs(a.r - b.r) + Math.abs(a.g - b.g) + Math.abs(a.b - b.b)) / (255 * 3) * 100
+      );
+    }
+
+    function noteSampleError(err) {
+      errorCount += 1;
+      if (errorCount === 1 || errorCount % 50 === 0) {
+        const message = err && err.message ? err.message : String(err);
+        log(t(`[HEALTH] 取樣錯誤 ${errorCount} 次：`, `[HEALTH] Sampling error ${errorCount}: `) + message);
+      }
+    }
+
+    function checkColors() {
+      if (!video.videoWidth || !video.videoHeight || video.readyState < 2) return;
+
+      // Resize only when the captured resolution changes: assigning width or
+      // height reallocates the backing store and is expensive every tick.
+      try {
+        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+        }
+        ctx.drawImage(video, 0, 0);
+      } catch (err) {
+        noteSampleError(err);
+        return;
+      }
+
+      lastSampleAt = Date.now();
+      sampleCount += 1;
+      stallLogged = false;
+
+      if (monitorStartedAt && lastSampleAt - lastHeartbeatAt >= 10 * 60 * 1000) {
+        lastHeartbeatAt = lastSampleAt;
+        log(t(`[HEALTH] 已連續取樣 ${sampleCount} 次，錯誤 ${errorCount} 次`,
+          `[HEALTH] ${sampleCount} samples taken, ${errorCount} error(s)`));
+      }
+
+      const parentW = zoomStage.clientWidth;
+      const parentH = zoomStage.clientHeight;
+      const threshold = parseInt(sensitivityInput.value, 10);
+      const mode = detectModeSelect.value;
+
+      zones.forEach(zone => {
+        const absX = zone.relBox.xPct * parentW;
+        const absY = zone.relBox.yPct * parentH;
+        const absW = zone.relBox.wPct * parentW;
+        const absH = zone.relBox.hPct * parentH;
+
+        const scaleX = video.videoWidth / parentW;
+        const scaleY = video.videoHeight / parentH;
+
+        let vx, vy, vw, vh;
+        if (mode === 'pixel') {
+          // Use the independent probe point: the centre of a clamped box can
+          // never land on the first or last pixel of the captured frame.
+          const pt = zone.point || zoneCenter(zone);
+          vx = clampPct(pt.xPct) * parentW * scaleX;
+          vy = clampPct(pt.yPct) * parentH * scaleY;
+          vw = 1; vh = 1;
+        } else {
+          vx = absX * scaleX;
+          vy = absY * scaleY;
+          vw = absW * scaleX;
+          vh = absH * scaleY;
+        }
+
+        if (vw <= 0 || vh <= 0) return;
+
+        const sx = Math.max(0, Math.min(canvas.width - 1, Math.floor(vx)));
+        const sy = Math.max(0, Math.min(canvas.height - 1, Math.floor(vy)));
+        let imgData;
+        try {
+          imgData = ctx.getImageData(
+            sx,
+            sy,
+            Math.max(1, Math.min(canvas.width - sx, Math.ceil(vw))),
+            Math.max(1, Math.min(canvas.height - sy, Math.ceil(vh)))
+          );
+        } catch (err) {
+          noteSampleError(err);
+          return;
+        }
+
+        let r = 0, g = 0, b = 0;
+        const totalPixels = imgData.data.length / 4;
+
+        for (let i = 0; i < imgData.data.length; i += 4) {
+          r += imgData.data[i];
+          g += imgData.data[i + 1];
+          b += imgData.data[i + 2];
+        }
+
+        r = Math.round(r / totalPixels);
+        g = Math.round(g / totalPixels);
+        b = Math.round(b / totalPixels);
+        const sample = { r, g, b };
+
+        document.getElementById(`swatch-${zone.id}`).style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        document.getElementById(`rgb-${zone.id}`).textContent = `${r}, ${g}, ${b}`;
+        const boxEl = document.getElementById(`crop-box-${zone.id}`);
+        if (boxEl) boxEl.style.setProperty('--sample-color', `rgb(${r}, ${g}, ${b})`);
+
+        if (zone.paused) return;
+
+        if (!zone.baseline) {
+          zone.baseline = sample;
+          return;
+        }
+
+        const delta = colorDelta(sample, zone.baseline);
+        document.getElementById(`delta-${zone.id}`).textContent = `${delta}%`;
+
+        // After a mode change the first few frames only rebuild the baseline.
+        if (performance.now() < rebaselineUntil) {
+          zone.baseline = sample;
+          return;
+        }
+
+        if (delta >= threshold) {
+          log(t(`[ALERT] 區域 ${zone.id} 偵測到顏色劇烈變化! Delta: ${delta}% (門檻 ${threshold}%)`,
+            `[ALERT] Zone ${zone.id} changed color! Delta ${delta}% (threshold ${threshold}%)`));
+          startAlarmSound(false);
+          zone.baseline = sample;
+        }
+      });
+    }
+
+    /* ---------- long-run health ----------------------------------------- */
+    function formatSampleAge(ms) {
+      const seconds = Math.max(0, ms) / 1000;
+      const value = seconds < 10 ? seconds.toFixed(1) : String(Math.round(seconds));
+      return window.getLang() === 'en' ? `${value}s ago` : `${value} 秒前`;
+    }
+
+    function updateHealth() {
+      if (!healthRow) return;
+      const active = Boolean(stream && monitorInterval);
+      if (!active) {
+        healthRow.dataset.state = 'idle';
+        if (healthText) healthText.textContent = t('尚未開始取樣', 'No samples yet');
+        if (healthAge) healthAge.textContent = '';
+        return;
+      }
+      if (!lastSampleAt) {
+        healthRow.dataset.state = 'idle';
+        if (healthText) healthText.textContent = t('等待第一次取樣…', 'Waiting for first sample…');
+        if (healthAge) healthAge.textContent = '';
+        return;
+      }
+
+      const intervalMs = Math.max(500, parseFloat(intervalSecInput.value) * 1000);
+      const age = Date.now() - lastSampleAt;
+      const stale = age > Math.max(5000, intervalMs * 3);
+      healthRow.dataset.state = stale ? 'stale' : 'ok';
+      if (healthText) healthText.textContent = stale
+        ? t('取樣停頓', 'Sampling stalled')
+        : t('取樣正常', 'Sampling OK');
+      if (healthAge) healthAge.textContent = formatSampleAge(age);
+
+      if (stale && !stallLogged) {
+        stallLogged = true;
+        log(t(`[HEALTH] 取樣停頓超過 ${Math.round(age / 1000)} 秒，請確認分頁仍在前台或分享來源仍在執行`,
+          `[HEALTH] No sample for ${Math.round(age / 1000)}s — check the tab or the shared source`));
+      }
+    }
+
+    healthTimer = setInterval(updateHealth, 1000);
+    updateHealth();
+
+    // Background tabs throttle timers. Resample as soon as the page is visible
+    // again instead of trusting whatever the last tick produced.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      if (!stream || !monitorInterval) return;
+      log(t('[SYNC] 分頁回到前景，立即重新取樣', '[SYNC] Tab visible again — resampling now'));
+      checkColors();
+      updateHealth();
+    });
+
+    /* ---------- self-test ------------------------------------------------ */
+    function testLabel(key) {
+      const zh = {
+        'test.api': '螢幕擷取 API',
+        'test.pixels': '像素取樣計算',
+        'test.delta': '色差計算',
+        'test.threshold': '靈敏度門檻',
+        'test.alarm': '警報流程可用'
+      };
+      return tKey(key, zh[key] || key);
+    }
+
+    function renderSelfTest() {
+      if (!selfTestChecks || !selfTestSummary) {
+        if (selfTestStatus) {
+          selfTestStatus.textContent = t('不用分享畫面，檢查取樣計算、門檻與警報流程。',
+            'Checks sampling math, threshold and alarm pipeline without sharing the screen.');
+        }
+        if (selfTestResults) selfTestResults.hidden = true;
+        return;
+      }
+      if (selfTestResults) {
+        selfTestResults.textContent = '';
+        selfTestResults.hidden = false;
+        selfTestChecks.forEach(check => {
+          const li = document.createElement('li');
+          li.className = check.pass ? 'pass' : 'fail';
+          const label = document.createElement('span');
+          label.textContent = testLabel(check.key);
+          const verdict = document.createElement('span');
+          verdict.className = 'test-verdict';
+          verdict.textContent = check.pass ? t('通過', 'Pass') : t('失敗', 'Fail');
+          li.append(label, verdict);
+          selfTestResults.append(li);
+        });
+      }
+      if (selfTestStatus) {
+        selfTestStatus.textContent = t(
+          `自我測試：${selfTestSummary.passed}/${selfTestSummary.total} 項通過`,
+          `Self-test: ${selfTestSummary.passed}/${selfTestSummary.total} checks passed`
+        );
+      }
+    }
+
+    async function runSelfTest() {
+      if (!selfTestBtn) return;
+      selfTestBtn.disabled = true;
+      if (selfTestStatus) selfTestStatus.textContent = t('測試中…', 'Running…');
+      if (selfTestResults) {
+        selfTestResults.textContent = '';
+        selfTestResults.hidden = false;
+      }
+
+      const checks = [];
+      checks.push({
+        key: 'test.api',
+        pass: Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function')
+      });
+
+      // Synthetic four-colour canvas: reading each corner proves the 1 px
+      // sampling math works where a clamped box used to fail.
+      try {
+        const probe = document.createElement('canvas');
+        probe.width = 64;
+        probe.height = 64;
+        const pctx = probe.getContext('2d', { willReadFrequently: true });
+        pctx.fillStyle = '#ff0000';
+        pctx.fillRect(0, 0, 32, 32);
+        pctx.fillStyle = '#00ff00';
+        pctx.fillRect(32, 0, 32, 32);
+        pctx.fillStyle = '#0000ff';
+        pctx.fillRect(0, 32, 32, 32);
+        pctx.fillStyle = '#ffffff';
+        pctx.fillRect(32, 32, 32, 32);
+        const at = (x, y) => {
+          const d = pctx.getImageData(x, y, 1, 1).data;
+          return { r: d[0], g: d[1], b: d[2] };
+        };
+        checks.push({
+          key: 'test.pixels',
+          pass: colorDelta(at(0, 0), { r: 255, g: 0, b: 0 }) === 0 &&
+            colorDelta(at(63, 0), { r: 0, g: 255, b: 0 }) === 0 &&
+            colorDelta(at(0, 63), { r: 0, g: 0, b: 255 }) === 0 &&
+            colorDelta(at(63, 63), { r: 255, g: 255, b: 255 }) === 0
+        });
+      } catch (err) {
+        checks.push({ key: 'test.pixels', pass: false });
+      }
+
+      checks.push({
+        key: 'test.delta',
+        pass: colorDelta({ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 }) === 100 &&
+          colorDelta({ r: 12, g: 34, b: 56 }, { r: 12, g: 34, b: 56 }) === 0
+      });
+
+      const threshold = parseInt(sensitivityInput.value, 10);
+      checks.push({
+        key: 'test.threshold',
+        pass: Number.isFinite(threshold) && threshold >= 1 && threshold <= 50
+      });
+
+      checks.push({
+        key: 'test.alarm',
+        pass: typeof startAlarmSound === 'function' &&
+          typeof stopAlarmSound === 'function' && Boolean(alarmBanner)
+      });
+
+      selfTestChecks = checks;
+      selfTestSummary = {
+        passed: checks.filter(check => check.pass).length,
+        total: checks.length
+      };
+      renderSelfTest();
+      const summary = selfTestStatus ? selfTestStatus.textContent : '';
+      log(`[TEST] ${summary}`);
+      checks.filter(check => !check.pass).forEach(check => {
+        log(`[TEST] ${t('失敗：', 'Failed: ')}${testLabel(check.key)}`);
+      });
+      selfTestBtn.disabled = false;
+    }
+
+    if (selfTestBtn) selfTestBtn.addEventListener('click', runSelfTest);
+
+    const versionBtn = document.getElementById('version-history-btn');
+    if (versionBtn) {
+      versionBtn.addEventListener('click', () => {
+        toggleModal(true);
+        requestAnimationFrame(() => {
+          const heading = document.getElementById('version-history');
+          if (!heading) return;
+          heading.scrollIntoView({ block: 'start', behavior: 'smooth' });
+          heading.focus({ preventScroll: true });
+        });
+      });
+    }
+
+    /* Re-render the few strings that JS owns, so switching language is live. */
+    function refreshLanguageDependentText() {
+      updateHealth();
+      renderSelfTest();
+      const state = systemStatus.dataset.state || 'idle';
+      if (state === 'on') systemStatus.textContent = t('監控中', 'Live');
+      else if (state === 'off') systemStatus.textContent = t('已停止', 'Stopped');
+      else systemStatus.textContent = t('待機中', 'Standby');
+
+      zones.forEach(z => {
+        const btn = document.getElementById(`pause-btn-${z.id}`);
+        if (btn) btn.textContent = z.paused ? t('已關閉', 'Off') : t('監控中', 'Live');
+      });
+
+      timerBtn.textContent = scheduleActive ? t('取消', 'Cancel') : t('啟動排程', 'Start schedule');
+      if (!scheduleActive) timerStatusEl.textContent = t('未啟用', 'Off');
+      if (alarmTimer) {
+        alarmBannerText.textContent = t('[ALERT] 偵測到 狀態顏色變更！警報響起中...',
+          '[ALERT] Color change detected — alarm active…');
+      }
+    }
+
+    refreshLanguageDependentText();
+    window.addEventListener('langchange', refreshLanguageDependentText);
+  </script>
+
+  <!-- ==================================================================
+       STYLE KIT runtime — independent of the monitor logic above.
+       Keeps its own localStorage keys never touches job-monitor-v282-settings.
+       ================================================================== -->
+  <script>
+  (function () {
+    'use strict';
+
+    const P = 'job-monitor-v282-stylekit';
+    const STYLES = {
+      original:  '原版 (Original)',
+      glass:     '玻璃 (Glass)',
+      liquid:    '液態玻璃 (Liquid Glass)',
+      neumorph:  '新擬態 (Neumorphism)',
+      brutal:    '野獸派 (Brutalism)',
+      neubrutal: '暗黑粗獷 (Dark Neubrutalism)',
+      clay:      '黏土 (Clay)',
+      editorial: '雜誌 (Editorial)',
+      terminal:  '終端機 (Terminal)',
+      aurora:    '極光 (Aurora)',
+    };
+
+    const root = document.documentElement;
+    const body = document.body;
+    const $ = (sel) => document.querySelector(sel);
+
+    const els = {
+      chips: [...document.querySelectorAll('.style-chip[data-skin]')],
+      panel: $('#themePanel'),
+      open: $('#openStylePanel'),
+      close: $('#closeStylePanel'),
+      remember: $('#rememberStyle'),
+      presetName: $('#presetName'),
+      savePreset: $('#savePreset'),
+      presetList: $('#presetList'),
+      exportBtn: $('#exportSettings'),
+      importBtn: $('#importSettings'),
+      importFile: $('#importFile'),
+      status: $('#storageStatus'),
+      current: $('#currentStyleName'),
+      reset: $('#resetStyle'),
+      colorPicker: $('#custom-color-picker'),
+    };
+
+    // CSS anchor positioning is preferred; older engines get a measured,
+    // viewport-clamped fallback that keeps the panel beside its trigger.
+    const supportsAnchors = typeof CSS !== 'undefined' && CSS.supports &&
+      CSS.supports('anchor-name: --a') && CSS.supports('position-anchor: --a');
+
+    function positionLooksPanel() {
+      if (!els.panel || !els.open || supportsAnchors || els.panel.hidden) return;
+      const trigger = els.open.getBoundingClientRect();
+      const panel = els.panel;
+      const margin = 8;
+      panel.style.right = 'auto';
+      panel.style.bottom = 'auto';
+      const width = panel.offsetWidth;
+      const height = panel.offsetHeight;
+      const left = Math.max(margin, Math.min(trigger.right - width, window.innerWidth - width - margin));
+      let top = trigger.bottom + margin;
+      if (top + height > window.innerHeight - margin) {
+        top = Math.max(margin, trigger.top - height - margin);
+      }
+      panel.style.left = Math.round(Math.max(margin, left)) + 'px';
+      panel.style.top = Math.round(top) + 'px';
+    }
+
+    window.addEventListener('resize', () => {
+      if (els.panel && !els.panel.hidden) positionLooksPanel();
+    });
+
+    function readJSON(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; }
+      catch (e) { return fallback; }
+    }
+    function writeJSON(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); }
+      catch (e) { /* private mode / quota */ }
+    }
+    function storedLook() {
+      if (localStorage.getItem(P + ':remember') === '0') return {};
+      const saved = readJSON(P, {});
+      return saved && typeof saved === 'object' ? saved : {};
+    }
+
+    const saved = storedLook();
+    const state = {
+      style: STYLES[saved.style] ? saved.style : 'original',
+      remember: localStorage.getItem(P + ':remember') !== '0',
+      colorTheme: saved.colorTheme || null,
+      pattern: saved.pattern || null,
+      customColor: saved.customColor || null,
+    };
+
+    /** The current look = style + the app's own palette/pattern/color. */
+    function snapshot() {
+      return {
+        style: state.style,
+        colorTheme: body.getAttribute('data-theme') || 'purple-dark',
+        pattern: body.getAttribute('data-pattern') || 'dots',
+        customColor: els.colorPicker ? els.colorPicker.value : null,
+      };
+    }
+
+    function save() {
+      try {
+        localStorage.setItem(P + ':remember', state.remember ? '1' : '0');
+        if (!state.remember) { localStorage.removeItem(P); return; }
+        localStorage.setItem(P, JSON.stringify(snapshot()));
+      } catch (e) { /* ignore */ }
+    }
+
+    function styleLabel(id) {
+      const label = STYLES[id] || id;
+      if (typeof window.getLang === 'function' && window.getLang() === 'en') {
+        const m = label.match(/\(([^)]+)\)/);
+        return m ? m[1] : label;
+      }
+      return label;
+    }
+
+    function syncUI() {
+      root.dataset.style = state.style;
+      els.chips.forEach((btn) =>
+        btn.setAttribute('aria-pressed', String(btn.dataset.skin === state.style))
+      );
+      els.current.textContent = styleLabel(state.style);
+      els.remember.checked = state.remember;
+    }
+
+    function apply() {
+      syncUI();
+      save();
+    }
+
+    function setStyle(id) {
+      if (!STYLES[id]) return;
+      state.style = id;
+      apply();
+      setStatus(t('已切換外觀：', 'Look: ') + styleLabel(id));
+    }
+
+    /* ---------- status line ---------- */
+    let statusTimer;
+    function setStatus(message, sticky) {
+      els.status.textContent = message;
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(refreshStatus, sticky ? 8000 : 4500);
+    }
+    function refreshStatus() {
+      els.status.textContent = state.remember
+        ? t('外觀設定會自動儲存在此裝置。', 'Appearance is saved on this device.')
+        : t('未啟用記憶 — 重新整理後會回到預設外觀（已儲存的外觀仍保留）。',
+            'Memory is off — reload returns to the default look (saved looks are kept).');
+    }
+
+    /* ---------- keep the app's palette/pattern in our snapshot ---------- */
+    function hook(fnName, key) {
+      const original = window[fnName];
+      if (typeof original !== 'function') return;
+      window[fnName] = function (value) {
+        const result = original.apply(this, arguments);
+        state[key] = value;
+        save();
+        return result;
+      };
+    }
+    hook('changeTheme', 'colorTheme');
+    hook('changePattern', 'pattern');
+    if (typeof window.updateCustomColor === 'function') {
+      const originalUpdate = window.updateCustomColor;
+      window.updateCustomColor = function (value) {
+        const result = originalUpdate.call(this, value);
+        save();
+        return result;
+      };
+    }
+    /* re-assert the look recorded in our key (runs after the app's loadOptions) */
+    if (state.colorTheme) body.setAttribute('data-theme', state.colorTheme);
+    if (state.pattern) body.setAttribute('data-pattern', state.pattern);
+    if (state.customColor && typeof window.applyCustomColor === 'function') {
+      els.colorPicker.value = state.customColor;
+      window.applyCustomColor(state.customColor);
+    }
+
+    /* ---------- named looks ---------- */
+    let presets = readJSON(P + ':presets', []);
+    if (!Array.isArray(presets)) presets = [];
+
+    function renderPresets() {
+      els.presetList.textContent = '';
+      if (!presets.length) {
+        const empty = document.createElement('li');
+        empty.className = 'preset-empty';
+        empty.textContent = t('尚未儲存任何外觀。', 'No saved looks yet.');
+        els.presetList.append(empty);
+        return;
+      }
+      presets.forEach((preset) => {
+        const item = document.createElement('li');
+        item.className = 'preset';
+
+        const name = document.createElement('button');
+        name.type = 'button';
+        name.className = 'preset-name';
+        name.textContent = preset.name;
+        name.title = t('套用「', 'Apply “') + preset.name + t('」', '”');
+        name.addEventListener('click', () => {
+          applySettings(preset.settings);
+          setStatus(t('已套用「', 'Applied “') + preset.name + t('」。', '”.'));
+        });
+
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'preset-del';
+        del.textContent = '✕';
+        del.setAttribute('aria-label', t('刪除「', 'Delete “') + preset.name + t('」', '”'));
+        del.addEventListener('click', () => {
+          presets = presets.filter((p) => p.id !== preset.id);
+          writeJSON(P + ':presets', presets);
+          renderPresets();
+          setStatus(t('已刪除「', 'Deleted “') + preset.name + t('」。', '”.'));
+        });
+
+        item.append(name, del);
+        els.presetList.append(item);
+      });
+    }
+
+    function savePreset() {
+      const name = els.presetName.value.trim() || (t('外觀 ', 'Look ') + (presets.length + 1));
+      presets.push({
+        id: 'p_' + Date.now().toString(36),
+        name,
+        settings: snapshot(),
+        savedAt: new Date().toISOString(),
+      });
+      writeJSON(P + ':presets', presets);
+      els.presetName.value = '';
+      renderPresets();
+      setStatus(t('已儲存「', 'Saved “') + name + t('」。', '”.'));
+    }
+
+    function applySettings(settings) {
+      if (!settings || typeof settings !== 'object') return;
+      if (STYLES[settings.style]) { state.style = settings.style; apply(); }
+      if (settings.colorTheme && typeof window.changeTheme === 'function') {
+        window.changeTheme(settings.colorTheme);
+        const themeSelect = document.getElementById('theme-selector');
+        if (themeSelect) themeSelect.value = settings.colorTheme;
+      }
+      if (settings.pattern && typeof window.changePattern === 'function') {
+        window.changePattern(settings.pattern);
+        const patternSelect = document.getElementById('pattern-selector');
+        if (patternSelect) patternSelect.value = settings.pattern;
+      }
+      if (settings.customColor && els.colorPicker) {
+        els.colorPicker.value = settings.customColor;
+        if (typeof window.applyCustomColor === 'function') window.applyCustomColor(settings.customColor);
+      }
+      apply();
+    }
+
+    /* ---------- export / import ---------- */
+    function exportSettings() {
+      const payload = {
+        app: 'monitor-stylekit', version: 1,
+        exportedAt: new Date().toISOString(),
+        current: snapshot(), presets,
+      };
+      const url = URL.createObjectURL(
+        new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+      );
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'monitor-stylekit.json';
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setStatus(t('已匯出外觀設定 JSON。', 'Appearance JSON exported.'));
+    }
+
+    async function importSettings(file) {
+      try {
+        const data = JSON.parse(await file.text());
+        if (data.current) applySettings(data.current);
+        const incoming = Array.isArray(data.presets) ? data.presets : [];
+        if (incoming.length) {
+          const known = new Set(presets.map((p) => p.id));
+          const fresh = incoming.filter((p) => p && p.settings && !known.has(p.id));
+          presets = presets.concat(fresh);
+          writeJSON(P + ':presets', presets);
+          renderPresets();
+          setStatus(t('已匯入 ', 'Imported ') + fresh.length + t(' 個已儲存外觀。', ' saved look(s).'));
+        } else {
+          setStatus(t('已套用匯入的設定。', 'Imported settings applied.'));
+        }
+      } catch (e) {
+        setStatus(t('這個檔案不是有效的 Style Kit JSON。', 'That file is not a valid Style Kit JSON.'), true);
+      }
+    }
+
+    /* ---------- wiring ---------- */
+    els.chips.forEach((btn) =>
+      btn.addEventListener('click', () => setStyle(btn.dataset.skin))
+    );
+    els.open.addEventListener('click', () => {
+      const willOpen = els.panel.hidden;
+      els.panel.hidden = !willOpen;
+      els.open.setAttribute('aria-expanded', String(willOpen));
+      if (willOpen) {
+        requestAnimationFrame(positionLooksPanel);
+        els.close.focus();
+      }
+    });
+    els.close.addEventListener('click', () => {
+      els.panel.hidden = true;
+      els.open.setAttribute('aria-expanded', 'false');
+      els.open.focus();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !els.panel.hidden) els.close.click();
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (els.panel.hidden) return;
+      if (e.target.closest('#themePanel') || e.target.closest('#openStylePanel')) return;
+      els.close.click();
+    });
+    els.remember.addEventListener('change', (e) => {
+      state.remember = e.target.checked;
+      save();
+      setStatus(state.remember
+        ? t('記憶已開啟 — 外觀會自動儲存。', 'Memory on — appearance is saved automatically.')
+        : t('記憶已關閉 — 不再寫入目前外觀。', 'Memory off — the current look is no longer written.'));
+    });
+    els.savePreset.addEventListener('click', savePreset);
+    els.presetName.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); savePreset(); }
+    });
+    els.exportBtn.addEventListener('click', exportSettings);
+    els.importBtn.addEventListener('click', () => els.importFile.click());
+    els.importFile.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) importSettings(file);
+      e.target.value = '';
+    });
+    els.reset.addEventListener('click', () => {
+      state.style = 'original';
+      apply();
+      setStatus(t('已重設為原版外觀（配色與印花保持不變）。', 'Reset to the original look (palette and pattern unchanged).'));
+    });
+
+    /* Chrome can restore form values on reload — re-assert our state. */
+    window.addEventListener('pageshow', () => apply());
+
+    /* Generated labels (presets, status line) need a re-render on language switch. */
+    window.addEventListener('langchange', () => {
+      syncUI();
+      renderPresets();
+      refreshStatus();
+    });
+
+    /* ---------- start ---------- */
+    apply();
+    renderPresets();
+    refreshStatus();
+  })();
+  </script>
+</body>
+</html>
