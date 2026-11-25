@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant-TW" data-lang="zh" data-neu-mode="day">
+<html lang="en" data-lang="en" data-neu-mode="day">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,19 +11,22 @@
     (function () {
       var P = 'job-monitor-v282-stylekit';
       try {
-        if (localStorage.getItem(P + ':remember') === '0') return;
         var s = JSON.parse(localStorage.getItem(P) || '{}') || {};
         /* v2.9.4 removed Glass / Liquid Glass; never restore a dead style. */
         var known = { original: 1, neumorph: 1, brutal: 1, neubrutal: 1,
                       clay: 1, editorial: 1, terminal: 1, aurora: 1 };
         if (s.style && known[s.style]) document.documentElement.setAttribute('data-style', s.style);
-        /* v2.9.5: restore Neumorphism Day / Night before first paint. */
+        else document.documentElement.setAttribute('data-style', 'neumorph');
         if (s.neuMode === 'night') document.documentElement.setAttribute('data-neu-mode', 'night');
-      } catch (e) { /* first visit / storage blocked */ }
+        else document.documentElement.setAttribute('data-neu-mode', 'day');
+      } catch (e) {
+        document.documentElement.setAttribute('data-style', 'neumorph');
+        document.documentElement.setAttribute('data-neu-mode', 'day');
+      }
     })();
   </script>
 
-  <title>多區域色彩監控器 v2.9.5 · Multi-Zone Color Monitor</title>
+  <title>多區域色彩監控器 v2.9.6 · Multi-Zone Color Monitor</title>
   <style>
     /* ==========================================================================
        Theme 1: 經典紫藍 (Default Dark Mode)
@@ -384,7 +387,7 @@
       gap: 10px;
       padding: 12px 14px;
       border: 3px solid var(--stroke-color);
-      border-radius: 9px;
+      border-radius: 8px;
       margin-bottom: 12px;
       background: var(--subpanel-bg);
       color: var(--subpanel-text);
@@ -461,17 +464,18 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 18px;
-      height: 18px;
-      background: var(--button-bg);
-      color: var(--button-text);
-      border: 2px solid var(--stroke-color);
-      font-size: 0.72rem;
+      min-width: 1.2em;
+      height: auto;
+      background: transparent;
+      color: var(--headline-color);
+      border: none;
+      font-size: 0.95rem;
       font-weight: 900;
-      font-family: monospace;
-      border-radius: 3px;
-      margin-right: 4px;
+      font-family: inherit;
+      border-radius: 0;
+      margin-right: 0;
       text-shadow: none;
+      box-shadow: none;
     }
     .nb-alert-tag {
       display: inline-block;
@@ -489,44 +493,11 @@
 
 
     /* ==========================================================================
-       Neubrutalism Background Patterns (印花樣式)
+       Background patterns were removed in v2.9.6: the repeated grid/dots
+       texture made the stage noisy. The attribute is kept for saved looks but
+       no longer paints a repeating texture.
        ========================================================================== */
-    body[data-pattern="dots"] {
-      background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px);
-      background-size: 20px 20px;
-    }
-    body[data-pattern="grid"] {
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
-      background-size: 24px 24px;
-    }
-    body[data-pattern="diagonal"] {
-      background-image: repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 10px,
-        rgba(255, 255, 255, 0.06) 10px,
-        rgba(255, 255, 255, 0.06) 12px
-      );
-    }
-    body[data-pattern="cross"] {
-      background-image: 
-        radial-gradient(circle, rgba(255, 255, 255, 0.18) 1.5px, transparent 1.5px),
-        radial-gradient(circle, var(--highlight-color) 1px, transparent 1px);
-      background-size: 28px 28px;
-      background-position: 0 0, 14px 14px;
-    }
-    body[data-pattern="checker"] {
-      background-image: 
-        linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%), 
-        linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%), 
-        linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.05) 75%), 
-        linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.05) 75%);
-      background-size: 24px 24px;
-      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
-    }
-    body[data-pattern="none"] {
+    body[data-pattern] {
       background-image: none;
     }
 
@@ -679,8 +650,7 @@
 
     .video-container {
       background-color: var(--main-color);
-      background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1.5px, transparent 1.5px);
-      background-size: 20px 20px;
+      background-image: none;
       border-radius: 10px;
       position: relative;
       overflow: hidden;
@@ -1191,13 +1161,25 @@
     .health-row[data-state="ok"] .health-dot { background: #22c55e; }
     .health-row[data-state="stale"] .health-dot { background: var(--danger-color); }
     .health-row[data-state="stale"] { border-style: solid; }
-    .health-age {
+    .health-time {
       margin-left: auto;
       min-width: 5.6em;
       text-align: right;
       font-variant-numeric: tabular-nums;
       color: var(--paragraph-color);
       white-space: nowrap;
+      letter-spacing: .02em;
+    }
+    .health-dot.is-sampling {
+      animation: health-sample-flash 620ms ease-out;
+    }
+    @keyframes health-sample-flash {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, #22c55e 60%, transparent); }
+      35% { transform: scale(1.6); box-shadow: 0 0 0 6px color-mix(in srgb, #22c55e 0%, transparent); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, #22c55e 0%, transparent); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .health-dot.is-sampling { animation: none; }
     }
 
     /* --- self-test ------------------------------------------------------- */
@@ -1251,18 +1233,13 @@
     .version-entry h3 {
       display: flex;
       align-items: baseline;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 6px 8px;
       margin: 0 0 5px;
-      font-size: 0.8rem;
+      font-size: 0.76rem;
       color: var(--headline-color);
     }
-    .version-date {
-      margin-left: auto;
-      font-size: 0.64rem;
-      font-weight: 600;
-      color: var(--paragraph-color);
-      font-variant-numeric: tabular-nums;
-    }
+    .version-date { display: none; }
     .version-latest {
       padding: 1px 6px;
       border-radius: 999px;
@@ -1270,6 +1247,40 @@
       color: #010101;
       font-size: 0.6rem;
       font-weight: 800;
+    }
+    .version-history-details {
+      margin: 10px 0 14px;
+      border: 1px solid var(--ui-rim, var(--stroke-color));
+      border-radius: 8px;
+      background: var(--subpanel-bg);
+      color: var(--subpanel-text);
+    }
+    .version-history-details > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--headline-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .version-history-details > summary::-webkit-details-marker { display: none; }
+    .version-history-details > summary::marker { content: ""; }
+    .version-history-details > summary::after {
+      content: "\25be";
+      flex: none;
+      opacity: .7;
+      font-size: 1.1em;
+      line-height: 1;
+    }
+    .version-history-details[open] > summary::after { content: "\25b4"; }
+    .version-history-details[open] > summary { border-bottom: 1px solid var(--ui-rim, var(--stroke-color)); }
+    .version-history-details .version-history {
+      margin: 0;
+      padding: 10px 12px 12px;
     }
     .version-entry ul {
       margin: 0;
@@ -1371,6 +1382,7 @@
       overscroll-behavior: contain;
     }
     .modal-content {
+      position: relative;
       background: var(--main-color);
       border: 3px solid var(--stroke-color);
       box-shadow: 6px 6px 0px var(--stroke-color);
@@ -1384,11 +1396,28 @@
     }
     .modal-content h1 {
       margin-bottom: 12px;
+      padding-right: 34px;
       font-size: 1.05rem;
       font-weight: 800;
       border-bottom: 2px solid var(--stroke-color);
       padding-bottom: 8px;
     }
+    .modal-x {
+      position: sticky;
+      float: right;
+      top: 10px;
+      margin: 0 0 8px 8px;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px;
+      border: 2px solid var(--ui-rim, var(--stroke-color));
+      border-radius: 8px;
+      background: var(--secondary-color); color: var(--headline-color);
+      font-size: 0.9rem; line-height: 1; cursor: pointer;
+      box-shadow: var(--ui-shadow-sm, 2px 2px 0 var(--stroke-color));
+      z-index: 5;
+    }
+    .modal-x:hover { transform: translateY(-1px); }
+    .modal-x:active { transform: translateY(0); }
     .modal-content h2 {
       margin: 12px 0 6px 0;
       font-size: 0.9rem;
@@ -1404,8 +1433,11 @@
     .modal-content b {
       color: var(--headline-color);
     }
+    .guide-sub { margin: 0 0 10px; font-size: 0.74rem; line-height: 1.55; color: var(--paragraph-color); }
+    .guide-link { color: var(--highlight-color); font-weight: 800; }
+    .guide-link:hover { text-decoration: underline; }
+    .guide-actions { display: flex; justify-content: flex-end; margin-top: 18px; }
     .modal-close {
-      margin-top: 18px;
       background: var(--button-bg);
       color: var(--button-text);
       border: 3px solid var(--stroke-color);
@@ -1415,7 +1447,6 @@
       border-radius: 6px;
       cursor: pointer;
       box-shadow: var(--geometric-shadow);
-      float: right;
       transition: transform 0.1s, box-shadow 0.1s;
     }
     .modal-close:hover {
@@ -1578,8 +1609,8 @@
       --ui-font: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
     }
     [data-style="neumorph"] { color-scheme: light; }
-    [data-style="neumorph"] body[data-pattern="dots"] {
-      background-image: radial-gradient(rgb(0 0 0 / 0.08) 1.5px, transparent 1.5px);
+    [data-style="neumorph"] body[data-pattern] {
+      background-image: none;
     }
 
     /* Neumorphism Night: the same geometry with a muted slate surface. The
@@ -1621,8 +1652,8 @@
       --neu-dark: rgb(0 0 0 / 0.45);
       --neu-dark-strong: rgb(0 0 0 / 0.5);
     }
-    [data-style="neumorph"][data-neu-mode="night"] body[data-pattern="dots"] {
-      background-image: radial-gradient(rgb(255 255 255 / 0.08) 1.5px, transparent 1.5px);
+    [data-style="neumorph"][data-neu-mode="night"] body[data-pattern] {
+      background-image: none;
     }
 
     /* --- 3. Brutalism -------------------------------------------------- */
@@ -1781,7 +1812,7 @@
 
     /* --- 8. Aurora ---------------------------------------------------- */
     [data-style="aurora"] body {
-      --ui-radius: 18px; --ui-radius-sm: 999px; --ui-border-w: 1px;
+      --ui-radius: 14px; --ui-radius-sm: 10px; --ui-pill: 10px; --ui-border-w: 1px;
       --ui-rim: color-mix(in srgb, var(--button-bg) 45%, transparent);
       --ui-surface: color-mix(in srgb, var(--main-color) 70%, transparent);
       --ui-subsurface: color-mix(in srgb, var(--subpanel-bg) 75%, transparent);
@@ -1792,6 +1823,21 @@
       --ui-shadow-sm: 0 0 0 1px color-mix(in srgb, var(--button-bg) 20%, transparent);
       --ui-sheen: linear-gradient(135deg, color-mix(in srgb, var(--button-bg) 14%, transparent), transparent 55%);
       --ui-text-shadow: none;
+    }
+    [data-style="aurora"] .btn,
+    [data-style="aurora"] .header-btn,
+    [data-style="aurora"] .style-chip,
+    [data-style="aurora"] .panel-btn,
+    [data-style="aurora"] .toggle-btn,
+    [data-style="aurora"] .step-nav-btn,
+    [data-style="aurora"] .stop-alarm-btn,
+    [data-style="aurora"] .zoom-btn {
+      border-radius: 10px;
+    }
+    [data-style="aurora"] .status-badge,
+    [data-style="aurora"] .swatch,
+    [data-style="aurora"] .next-step-count {
+      border-radius: 10px;
     }
 
     /* --- the style bar -------------------------------------------------- */
@@ -1957,9 +2003,31 @@
     }
     .header-btn:hover { transform: translateY(-1px); }
     .header-btn:active { transform: translateY(0); }
+    .header-btn[hidden] { display: none; }
     .header-btn[aria-expanded="true"] { background: var(--button-bg); color: var(--button-text); }
     .info-icon { padding: 5px 11px; font-size: 0.76rem; }
-    .lang-btn { min-width: 48px; font-family: ui-monospace, monospace; letter-spacing: .02em; }
+    /* Help is a bare "?" glyph in v2.9.6 - no button frame or halo. */
+    #openHelpBtn {
+      min-width: 0;
+      padding: 2px 4px;
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+    }
+    #openHelpBtn:hover,
+    #openHelpBtn:active {
+      transform: none;
+      box-shadow: none;
+      background: transparent;
+    }
+    .lang-btn { min-width: 84px; font-family: ui-monospace, monospace; letter-spacing: .02em; }
+    .lang-option[data-active="false"] { opacity: .55; font-weight: 600; }
+    .lang-option[data-active="true"] { text-decoration: underline; text-underline-offset: 3px; }
+    .lang-separator { opacity: .5; }
+    .mode-btn { min-width: 92px; gap: 6px; }
+    .mode-option[data-active="false"] { opacity: .55; font-weight: 600; }
+    .mode-option[data-active="true"] { text-decoration: underline; text-underline-offset: 3px; }
+    .mode-separator { opacity: .5; }
 
     /* --- collapsible sections keep every control but hide the noise ------ */
     .fold {
@@ -2124,6 +2192,48 @@
         6px 6px 14px var(--neu-dark),
         -6px -6px 14px var(--neu-light);
     }
+
+    [data-style="neumorph"] .empty-state,
+    [data-style="neumorph"] .placeholder-text {
+      box-shadow: var(--ui-shadow);
+      border-color: var(--ui-rim);
+    }
+    [data-style="neumorph"] .panel-group,
+    [data-style="neumorph"] .test-block {
+      box-shadow: var(--ui-shadow-sm);
+    }
+
+
+    /* --- v2.9.6: one light source for every Neumorphism surface -------------
+       Light comes from the top-left: a soft highlight on the top/left edge and
+       a matching shadow on the bottom/right edge. The centre stage card and
+       the right-side panel/sub-cards now share the same paired shadow, with a
+       smaller version for nested cards, so no surface looks "more raised". */
+    [data-style="neumorph"] body {
+      --neu-raise:
+        -6px -6px 14px var(--neu-light),
+        6px 6px 14px var(--neu-dark);
+      --neu-raise-sm:
+        -4px -4px 9px var(--neu-light),
+        4px 4px 9px var(--neu-dark);
+    }
+    [data-style="neumorph"] .card,
+    [data-style="neumorph"] .video-container,
+    [data-style="neumorph"] .modal-content,
+    [data-style="neumorph"] .theme-panel,
+    [data-style="neumorph"] .placeholder-text {
+      border-color: var(--ui-rim);
+      box-shadow: var(--neu-raise);
+    }
+    [data-style="neumorph"] .zone-card,
+    [data-style="neumorph"] .test-block,
+    [data-style="neumorph"] .panel-group,
+    [data-style="neumorph"] .health-row {
+      border-color: var(--ui-rim);
+      border-style: solid;
+      box-shadow: var(--neu-raise-sm);
+    }
+
     /* Darker zone colors stay legible on the light soft-UI background. */
     [data-style="neumorph"][data-neu-mode="day"] .box-zone-1 { border-color: #6c5ce7; }
     [data-style="neumorph"][data-neu-mode="day"] .box-zone-2 { border-color: #b8860b; }
@@ -2132,6 +2242,28 @@
     [data-style="neumorph"][data-neu-mode="night"] .box-zone-1 { border-color: #b8a9ff; }
     [data-style="neumorph"][data-neu-mode="night"] .box-zone-2 { border-color: #f1cf72; }
     [data-style="neumorph"][data-neu-mode="night"] .box-zone-3 { border-color: #7fd7c8; }
+
+    .step-guide-fab {
+      position: absolute;
+      left: 50%;
+      bottom: 62px;
+      transform: translateX(-50%);
+      z-index: 36;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: var(--ui-border-w, 2px) solid var(--ui-rim, var(--stroke-color));
+      border-radius: var(--ui-radius-sm, 8px);
+      background: var(--ui-surface, var(--main-color));
+      color: var(--headline-color);
+      box-shadow: var(--ui-shadow-sm, 2px 2px 0 var(--stroke-color));
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .step-guide-fab[hidden] { display: none; }
+    .step-guide-fab:hover { transform: translateX(-50%) translateY(-1px); }
 
     /* --- next-step coach mark -------------------------------------------
        State/labels stay in the DOM (never CSS content) so screen readers and
@@ -2161,6 +2293,17 @@
       font-size: 0.66rem; font-weight: 900; font-variant-numeric: tabular-nums;
     }
     .next-step-text { flex: 1; min-width: 0; text-shadow: none; }
+    .step-nav-btn {
+      flex: none; display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; padding: 0;
+      border: 1px solid var(--ui-rim, var(--stroke-color));
+      border-radius: 7px;
+      background: var(--ui-subsurface, var(--subpanel-bg));
+      color: var(--headline-color); cursor: pointer;
+      font-size: 1rem; line-height: 1;
+    }
+    .step-nav-btn:hover:not(:disabled) { background: var(--button-bg); color: var(--button-text); }
+    .step-nav-btn:disabled { opacity: .35; cursor: default; }
     .next-step-close {
       flex: none; border: 0; box-shadow: none; background: none;
       color: var(--paragraph-color); cursor: pointer;
@@ -2283,7 +2426,6 @@
     (function () {
       var P = 'job-monitor-v282-stylekit';
       try {
-        if (localStorage.getItem(P + ':remember') === '0') return;
         var s = JSON.parse(localStorage.getItem(P) || '{}') || {};
         if (s.colorTheme) document.body.setAttribute('data-theme', s.colorTheme);
         if (s.pattern) document.body.setAttribute('data-pattern', s.pattern);
@@ -2295,13 +2437,14 @@
   <header>
     <div class="header-left">
       <h1><span class="nb-icon-box" aria-hidden="true">MON</span> <span data-i18n="app.title">多區域色彩監控器</span></h1>
-      <button type="button" class="version-tag" id="version-history-btn" aria-haspopup="dialog" aria-label="v2.9.5 版本歷史" data-i18n-aria="version.open">v2.9.5</button>
+      <button type="button" class="version-tag" id="version-history-btn" aria-haspopup="dialog" aria-label="v2.9.6 版本歷史" data-i18n-aria="version.open">v2.9.6</button>
     </div>
     <div class="header-right">
       <span id="system-status" class="status-badge badge-off" role="status" aria-live="polite">待機中</span>
-      <button type="button" class="header-btn lang-btn" id="lang-toggle" aria-label="切換語言 / Switch language">EN</button>
-      <button type="button" class="header-btn info-icon" id="openStylePanel" aria-controls="themePanel" aria-expanded="false" aria-label="外觀設定" data-i18n-aria="header.settingsAria"><span aria-hidden="true">⚙</span> <span data-i18n="header.settings">外觀</span></button>
-      <button type="button" class="header-btn info-icon" onclick="toggleModal(true)" aria-haspopup="dialog"><span class="nb-mini-tag" aria-hidden="true">?</span> <span data-i18n="header.help">說明</span></button>
+      <button type="button" class="header-btn info-icon" id="openStylePanel" aria-controls="themePanel" aria-expanded="false" aria-label="UI設定" data-i18n-aria="header.settingsAria" data-i18n-title="header.settingsAria" title="UI設定"><span data-i18n="header.settings">UI</span></button>
+      <button type="button" class="header-btn mode-btn" id="neuModeToggle" aria-pressed="true" aria-label="切換為夜晚模式（套用所有風格）" data-i18n-aria="header.modeAria" data-i18n-title="header.modeTitle" data-zh-mode-day="白天" data-zh-mode-night="夜晚" data-zh-to-night="切換為夜晚模式（套用所有風格）" data-zh-to-day="切換為白天模式（套用所有風格）" data-zh-title="Dark / Light（套用所有風格）" title="Dark / Light（套用所有風格）"><span class="mode-option" data-mode-option="night" data-active="false">Dark</span><span class="mode-separator" aria-hidden="true"> / </span><span class="mode-option" data-mode-option="day" data-active="true">Light</span></button>
+      <button type="button" class="header-btn lang-btn" id="lang-toggle" aria-label="Language: EN / zh-HK — switch to Chinese (zh-HK)"><span class="lang-option" data-lang-option="en" data-active="true">EN</span><span class="lang-separator" aria-hidden="true"> / </span><span class="lang-option" data-lang-option="zh" data-active="false">zh-HK</span></button>
+      <button type="button" class="header-btn info-icon" id="openHelpBtn" onclick="toggleModal(true)" aria-haspopup="dialog" aria-label="說明" data-i18n-aria="header.help" data-i18n-title="header.help" title="說明"><span class="nb-mini-tag" aria-hidden="true">?</span></button>
     </div>
   </header>
 
@@ -2355,14 +2498,6 @@
         <button class="style-chip" type="button" data-skin="terminal"><span class="chip-dot" style="--sw:#22c55e"></span><span data-i18n="style.terminal">終端機</span></button>
         <button class="style-chip" type="button" data-skin="aurora"><span class="chip-dot" style="--sw:#8b5cf6"></span><span data-i18n="style.aurora">極光</span></button>
       </div>
-
-      <div class="neu-mode-row">
-        <span class="panel-label" data-i18n="panel.neuMode">明暗模式</span>
-        <div class="neu-mode-switch" role="group" data-i18n-aria="panel.neuModeAria" aria-label="所有風格的明暗模式">
-          <button class="neu-mode-btn" type="button" data-neu-mode="day" aria-pressed="true" data-i18n="panel.neuDay">白天</button>
-          <button class="neu-mode-btn" type="button" data-neu-mode="night" aria-pressed="false" data-i18n="panel.neuNight">夜晚</button>
-        </div>
-      </div>
     </div>
 
     <div class="panel-group">
@@ -2408,7 +2543,9 @@
 
   <dialog id="info-modal" class="modal-overlay" aria-labelledby="info-modal-title" closedby="any">
     <div class="modal-content">
-      <h1 id="info-modal-title"><span class="nb-icon-box" style="margin-right:6px;" aria-hidden="true">GUIDE</span> <span data-i18n="guide.title">v2.9.5 使用方法與功能指南</span></h1>
+      <button type="button" class="modal-x" onclick="toggleModal(false)" aria-label="關閉" data-i18n-aria="panel.close">✕</button>
+      <h1 id="info-modal-title"><span class="nb-icon-box" style="margin-right:6px;" aria-hidden="true">GUIDE</span> <span data-i18n="guide.title">v2.9.6 使用方法與功能指南</span></h1>
+      <p class="guide-sub" data-i18n="guide.closeHint" data-zh="可按右上角 ✕、按 Esc，或點擊對話框外的深色背景關閉。<br>GitHub：<a class='guide-link' href='https://github.com/JL7121021/color-monitor' target='_blank' rel='noopener noreferrer'>JL7121021/color-monitor</a>（<a class='guide-link' href='https://github.com/JL7121021/color-monitor' target='_blank' rel='noopener noreferrer'>★ Star</a>）">Close with ✕ (top-right), press Esc, or click the dark backdrop outside this dialog.<br>GitHub: <a class="guide-link" href="https://github.com/JL7121021/color-monitor" target="_blank" rel="noopener noreferrer">JL7121021/color-monitor</a> (<a class="guide-link" href="https://github.com/JL7121021/color-monitor" target="_blank" rel="noopener noreferrer">★ Star</a>)</p>
 
       <h2 data-i18n="guide.s1">1. 開始監控畫面</h2>
       <ul>
@@ -2420,7 +2557,7 @@
       <ul>
         <li data-i18n="guide.s2a">畫面中央會出現區域 1、2、3 的檢測框。</li>
         <li data-i18n="guide.s2b">移動位置：拖曳檢測框或取樣探針，或先聚焦再用方向鍵移動。區域模式可用 Shift + 方向鍵調整大小；精準取樣則是大步移動。</li>
-        <li data-i18n="guide.s2c">精準取樣：點擊或拖曳虛線探針，即可把十字準星放到想取樣的像素（含四個角落）；中央保持透明，標籤會顯示區域編號與即時取樣顏色。</li>
+        <li data-i18n="guide.s2c" data-zh="拖曳十字準星放到想取樣的像素位置（畫面四個角落也可以）。畫面會顯示區域編號，十字中央則顯示即時取樣的 RGB 顏色；放好後按下一步繼續。">拖曳十字準星放到想取樣的像素位置，畫面會顯示區域編號與十字中央的即時取樣顏色。</li>
         <li data-i18n="guide.s2d">縮放畫面：使用右上角 + / − 按鈕或滾輪縮放，放大後可拖曳背景平移。</li>
       </ul>
 
@@ -2438,15 +2575,26 @@
 
       <h2 data-i18n="guide.s5">5. 外觀風格與已儲存外觀 (Style Kit)</h2>
       <ul>
-        <li data-i18n="guide.s5a">右上角 ⚙ 外觀面板可切換 8 種設計風格、配色主題、背景印花與 Day / Night 明暗模式。</li>
+        <li data-i18n="guide.s5a">右上角可切換語言（EN/zh-HK）、⚙ 外觀面板，以及工具列上的 Day / Night 切換（套用所有風格）。</li>
         <li data-i18n="guide.s5b">可為目前外觀命名儲存、一鍵套用或刪除，並匯出 / 匯入 JSON 設定檔。</li>
         <li data-i18n="guide.s5c">外觀使用獨立的 LocalStorage 鍵，不會影響監控設定與區域座標。</li>
       </ul>
 
-      <h2 id="version-history" tabindex="-1" data-i18n="guide.history">版本歷史</h2>
-      <div class="version-history">
+      <details id="version-history-details" class="version-history-details">
+        <summary id="version-history" tabindex="-1" data-i18n="guide.history">版本歷史</summary>
+        <div class="version-history">
         <section class="version-entry">
-          <h3><span>v2.9.5</span><span class="version-date">2026-11-25</span><span class="version-latest" data-i18n="history.latest">最新</span></h3>
+          <h3><span>v2.9.6</span><span class="version-latest" data-i18n="history.latest">最新</span></h3>
+          <ul>
+            <li data-i18n="history.v296a">預設改為英文與 Neumorphism 白天模式；語言切換顯示為 EN / zh-HK 並即時更新按鈕說明。</li>
+            <li data-i18n="history.v296b">Day / Night 改為頁首按鈕（「Dark / Light」）；外觀面板移除重複的明暗切換。</li>
+            <li data-i18n="history.v296c">步驟指引可上一步／下一步，關閉後可從頁首重新開啟；GUIDE 視窗加入右上角關閉按鈕（✕）、可按 Esc 或點背景關閉。</li>
+            <li data-i18n="history.v296d">開始分享後，步驟 2 會一直顯示，直到使用者按「下一步」才進入步驟 3。</li>
+            <li data-i18n="history.v296e">GUIDE 視窗提供關閉方式說明，並加入 GitHub 專案與 ★ Star 連結。</li>
+          </ul>
+        </section>
+        <section class="version-entry">
+          <h3><span>v2.9.5</span></h3>
           <ul>
             <li data-i18n="history.v295a">Neumorphism 改為參考網站的淺灰軟 UI：無硬邊框、同色表面、雙層明暗陰影。</li>
             <li data-i18n="history.v295b">輸入框改為內凹軌道，按鈕與開關加入按壓內凹回饋；外觀面板新增適用所有風格的 Day / Night 明暗切換。</li>
@@ -2454,7 +2602,7 @@
           </ul>
         </section>
         <section class="version-entry">
-          <h3><span>v2.9.4</span><span class="version-date">2026-11-25</span></h3>
+          <h3><span>v2.9.4</span></h3>
           <ul>
             <li data-i18n="history.v294a">等到新的影像影格才取樣，修正第一次取得的顏色可能不正確。</li>
             <li data-i18n="history.v294b">加入三步驟引導提示，清楚告知開始分享、放置探針與調整監控。</li>
@@ -2463,7 +2611,7 @@
           </ul>
         </section>
         <section class="version-entry">
-          <h3><span>v2.9.3</span><span class="version-date">2026-11-25</span></h3>
+          <h3><span>v2.9.3</span></h3>
           <ul>
             <li data-i18n="history.v293a">修正中間「開始分享監控畫面」被影片層覆蓋而無法點擊。</li>
             <li data-i18n="history.v293b">新增自我測試與長時間監控健康狀態（最後取樣、停頓偵測、心跳紀錄）。</li>
@@ -2473,7 +2621,7 @@
           </ul>
         </section>
         <section class="version-entry">
-          <h3><span>v2.9.2</span><span class="version-date">2026-11-24</span></h3>
+          <h3><span>v2.9.2</span></h3>
           <ul>
             <li data-i18n="history.v292a">新增繁中／英文即時切換與液態玻璃等外觀風格。</li>
             <li data-i18n="history.v292b">簡化介面並修正版面位移問題。</li>
@@ -2481,20 +2629,21 @@
           </ul>
         </section>
         <section class="version-entry">
-          <h3><span>v2.9.1</span><span class="version-date">2026-11-24</span></h3>
+          <h3><span>v2.9.1</span></h3>
           <ul>
             <li data-i18n="history.v291a">介面簡化前的檢查點版本。</li>
           </ul>
         </section>
         <section class="version-entry">
-          <h3><span>v2.9.0</span><span class="version-date">2026-11-23</span></h3>
+          <h3><span>v2.9.0</span></h3>
           <ul>
             <li data-i18n="history.v290a">多區域色彩監控器原始版本。</li>
           </ul>
         </section>
-      </div>
+        </div>
+      </details>
 
-      <button class="modal-close" type="button" autofocus onclick="toggleModal(false)" data-i18n="guide.close">我知道了</button>
+      <div class="guide-actions"><button class="modal-close" type="button" autofocus onclick="toggleModal(false)" data-i18n="guide.close">我知道了</button></div>
     </div>
   </dialog>
 
@@ -2557,10 +2706,13 @@
         </div>
       </div>
 
+      <button id="next-step-guide" class="step-guide-fab" type="button" aria-label="顯示步驟指引" data-i18n-aria="next.reopenAria" data-i18n-title="next.reopenTitle" data-zh-aria="顯示步驟指引" data-zh-title="顯示步驟指引" title="顯示步驟指引" hidden>⭐ Guide</button>
       <div id="next-step" class="next-step" role="status" aria-live="polite" hidden data-visible="false">
         <span id="next-step-count" class="next-step-count">1/3</span>
         <span id="next-step-text" class="next-step-text" data-i18n="next.idle">步驟 1/3：點「開始分享監控畫面」，選擇要監控的視窗。</span>
-        <button id="next-step-close" class="next-step-close" type="button" aria-label="關閉提示" data-i18n-aria="next.dismiss">✕</button>
+        <button id="next-step-prev" class="step-nav-btn" type="button" aria-label="上一個步驟" data-i18n-aria="next.prev" data-i18n-title="next.prev" title="上一個步驟">‹</button>
+        <button id="next-step-next" class="step-nav-btn" type="button" aria-label="下一個步驟" data-i18n-aria="next.next" data-i18n-title="next.next" title="下一個步驟">›</button>
+        <button id="next-step-close" class="next-step-close" type="button" aria-label="關閉提示" data-i18n-aria="next.dismiss" data-i18n-title="next.dismiss" title="關閉提示">✕</button>
       </div>
     </div>
 
@@ -2575,8 +2727,8 @@
 
         <div class="health-row" id="health-row" data-state="idle" role="status" aria-live="off">
           <span class="health-dot" aria-hidden="true"></span>
+          <span id="health-time" class="health-time" aria-label="Last sample time" data-i18n-aria="health.time">--:--:--</span>
           <span id="health-text" data-i18n="health.waiting">尚未開始取樣</span>
-          <span id="health-age" class="health-age"></span>
         </div>
 
         <details class="fold" style="margin-top:10px;">
@@ -2720,12 +2872,17 @@
       const LANG_KEY = 'job-monitor-v282-lang';
       const EN = {
         'app.title': 'Multi-Zone Color Monitor',
-        'header.settings': 'Looks',
-        'header.settingsAria': 'Looks settings',
+        'header.settings': 'UI',
+        'header.settingsAria': 'UI settings',
         'header.help': 'Help',
-        'version.open': 'v2.9.5 version history',
+        'header.modeTitle': 'Day / Night (all styles)',
+        'header.modeAria': 'Toggle day or night mode for all styles',
+        'header.modeToNight': 'Switch to Night mode (applies to all styles)',
+        'header.modeToDay': 'Switch to Day mode (applies to all styles)',
+        'version.open': 'v2.9.6 version history',
 
         'health.waiting': 'No samples yet',
+        'health.time': 'Last sample time',
 
         'test.run': 'Run self-test',
         'test.running': 'Running…',
@@ -2786,14 +2943,15 @@
         'panel.foot': 'Stored separately · monitor settings untouched',
         'panel.reset': 'Reset',
 
-        'guide.title': 'v2.9.5 user guide',
+        'guide.title': 'v2.9.6 user guide',
+        'guide.closeHint': 'Close with ✕ (top-right), press Esc, or click the dark backdrop outside this dialog.<br>GitHub: <a class="guide-link" href="https://github.com/JL7121021/color-monitor" target="_blank" rel="noopener noreferrer">JL7121021/color-monitor</a> (<a class="guide-link" href="https://github.com/JL7121021/color-monitor" target="_blank" rel="noopener noreferrer">★ Star</a>)',
         'guide.s1': '1. Start monitoring',
         'guide.s1a': 'Click “Start screen share” in the control panel.',
         'guide.s1b': 'In the browser picker, choose the tab, window or screen to watch (a window showing the status display works best).',
         'guide.s2': '2. Place the zones',
         'guide.s2a': 'Three detection boxes appear over the shared view.',
         'guide.s2b': 'Move: drag a box, or focus it and use the arrow keys. Shift + arrows resizes in area mode; in precision mode it moves faster.',
-        'guide.s2c': 'Precision point: click or drag the dashed probe to drop the reticle on any pixel, including the screen corners. The tag shows the zone number and its live sampled color.',
+        'guide.s2c': 'Drag the crosshair to the pixel you want to sample (including the four corners). The zone number is shown and the crosshair center displays the live sampled RGB color. Press Next when ready.',
         'guide.s2d': 'Zoom with + / − or the scroll wheel; once zoomed, drag the background to pan.',
         'guide.s3': '3. Tune the detection',
         'guide.s3a': 'Detection mode: precision point (1 px) or area average color.',
@@ -2802,11 +2960,15 @@
         'guide.s4': '4. Automatic memory (localStorage)',
         'guide.s4a': 'Palette, pattern, detection mode, interval, sensitivity, schedule, zone positions and on/off states are saved automatically and restored on reload.',
         'guide.s5': '5. Looks and saved presets',
-        'guide.s5a': 'The ⚙ Looks panel switches all 8 styles, the color theme, the background pattern and Day / Night mode.',
+        'guide.s5a': 'Use the header to switch language (EN/zh-HK), open ⚙ Looks, or toggle Day / Night for every style.',
         'guide.s5b': 'Name and save a look, apply or delete it, or export / import looks as JSON.',
         'guide.s5c': 'Looks use their own storage keys and never change the monitoring settings or zone positions.',
         'guide.history': 'Version history',
         'history.latest': 'Latest',
+        'history.v296a': 'Defaults are now English with Neumorphism in Day mode; the language toggle shows EN / zh-HK and updates button hints in place.',
+        'history.v296b': 'Day / Night moved to a header button (“Dark / Light”); the duplicate switch was removed from the Looks panel.',
+        'history.v296c': 'Step guidance gained Previous/Next controls, can be reopened from the header, and the Guide dialog has an X close button.',
+        'history.v296d': 'After starting capture, Step 2 stays until you press Next, then advances to Step 3.',
         'history.v295a': 'Rebuilt Neumorphism from the reference sites: light grey soft UI, no hard borders, one surface color and paired light/dark shadows.',
         'history.v295b': 'Inputs became recessed tracks, buttons/switches gained inset pressed feedback, and a Day / Night switch for every style was added to the Looks panel.',
         'history.v295c': 'Terminal became a true CRT terminal look; Neumorphism page and surface colors were separated so the right-side shadow reads correctly.',
@@ -2835,10 +2997,15 @@
         'stage.hint': 'Pick the tab or window to watch, and three zone boxes appear over it.',
 
         'next.idle': 'Step 1/3 — Click “Start screen share”, then choose the tab or window to watch.',
-        'next.place': 'Step 2/3 — Drag a dashed probe onto the target pixel; moving it rebuilds that zone baseline.',
+        'next.place': 'Step 2/3 — Drag the crosshair to the pixel you want to sample. The zone number appears on screen and the crosshair center shows the live sampled color. Press Next › when ready.',
         'next.live': 'Step 3/3 — Live: tune sensitivity, pause a zone, or test the alarm any time.',
         'next.alarm': 'Alarm active — press “Dismiss alarm” to stop it.',
         'next.dismiss': 'Dismiss this hint',
+        'next.prev': 'Previous step',
+        'next.next': 'Next step',
+        'next.reopen': 'Guide',
+        'next.reopenAria': 'Show the step guide',
+        'next.reopenTitle': 'Show the step guide',
 
         'zone.1': 'Zone 1',
         'zone.2': 'Zone 2',
@@ -2879,8 +3046,12 @@
         'alarm.dismiss': 'Dismiss alarm',
       };
 
-      let lang = 'zh';
-      try { lang = localStorage.getItem(LANG_KEY) === 'en' ? 'en' : 'zh'; } catch (e) { /* storage blocked */ }
+      let lang = 'en';
+      try {
+        const savedLang = localStorage.getItem(LANG_KEY);
+        if (savedLang === 'zh') lang = 'zh';
+        else lang = 'en';
+      } catch (e) { /* storage blocked */ }
 
       function capture(root) {
         root.querySelectorAll('[data-i18n]').forEach((el) => {
@@ -2892,6 +3063,9 @@
         root.querySelectorAll('[data-i18n-aria]').forEach((el) => {
           if (el.dataset.zhAria === undefined) el.dataset.zhAria = el.getAttribute('aria-label') || '';
         });
+        root.querySelectorAll('[data-i18n-title]').forEach((el) => {
+          if (el.dataset.zhTitle === undefined) el.dataset.zhTitle = el.getAttribute('title') || '';
+        });
       }
 
       function pick(key, fallback) {
@@ -2901,7 +3075,10 @@
       function apply(root) {
         const scope = root || document;
         scope.querySelectorAll('[data-i18n]').forEach((el) => {
-          el.textContent = pick(el.dataset.i18n, el.dataset.zh);
+          const key = el.dataset.i18n;
+          const val = pick(key, el.dataset.zh);
+          if (key === 'guide.closeHint') el.innerHTML = val;
+          else el.textContent = val;
         });
         scope.querySelectorAll('[data-i18n-ph]').forEach((el) => {
           el.setAttribute('placeholder', pick(el.dataset.i18nPh, el.dataset.zhPh));
@@ -2909,12 +3086,41 @@
         scope.querySelectorAll('[data-i18n-aria]').forEach((el) => {
           el.setAttribute('aria-label', pick(el.dataset.i18nAria, el.dataset.zhAria));
         });
+        scope.querySelectorAll('[data-i18n-title]').forEach((el) => {
+          el.setAttribute('title', pick(el.dataset.i18nTitle, el.dataset.zhTitle));
+        });
         document.documentElement.lang = lang === 'en' ? 'en' : 'zh-Hant-TW';
         document.documentElement.dataset.lang = lang;
         const btn = document.getElementById('lang-toggle');
         if (btn) {
-          btn.textContent = lang === 'en' ? '中文' : 'EN';
-          btn.setAttribute('aria-label', lang === 'en' ? '切換成中文' : 'Switch to English');
+          btn.querySelectorAll('[data-lang-option]').forEach((opt) => {
+            opt.setAttribute('data-active', String(opt.dataset.langOption === lang));
+          });
+          btn.setAttribute('aria-label', lang === 'en'
+            ? 'Language: EN / zh-HK — switch to Chinese (zh-HK)'
+            : '語言：EN / zh-HK — 切換為 English');
+          btn.title = lang === 'en' ? 'Switch to Chinese (zh-HK)' : '切換為 English';
+        }
+        const openStyleBtn = document.getElementById('openStylePanel');
+        if (openStyleBtn) {
+          const looksLabel = pick('header.settingsAria', openStyleBtn.dataset.zhAria || '外觀設定');
+          openStyleBtn.title = looksLabel;
+        }
+        const modeToggle = document.getElementById('neuModeToggle');
+        if (modeToggle) {
+          const isNight = document.documentElement.getAttribute('data-neu-mode') === 'night';
+          modeToggle.querySelectorAll('[data-mode-option]').forEach((opt) => {
+            opt.setAttribute('data-active', String((opt.dataset.modeOption === 'night') === isNight));
+          });
+          modeToggle.setAttribute('aria-pressed', String(isNight));
+          modeToggle.setAttribute('aria-label', isNight
+            ? pick('header.modeToDay', modeToggle.dataset.zhToDay || '切換為白天模式（套用所有風格）')
+            : pick('header.modeToNight', modeToggle.dataset.zhToNight || '切換為夜晚模式（套用所有風格）'));
+          modeToggle.title = pick('header.modeTitle', modeToggle.dataset.zhTitle || '白天／夜晚（套用所有風格）');
+        }
+        const openHelpBtn = document.getElementById('openHelpBtn');
+        if (openHelpBtn) {
+          openHelpBtn.title = pick('header.help', openHelpBtn.textContent.trim() || '說明');
         }
       }
 
@@ -3146,7 +3352,6 @@
     const videoWrapper = document.getElementById('video-wrapper');
     const healthRow = document.getElementById('health-row');
     const healthText = document.getElementById('health-text');
-    const healthAge = document.getElementById('health-age');
     const stageError = document.getElementById('stage-error');
     const selfTestBtn = document.getElementById('self-test-btn');
     const selfTestStatus = document.getElementById('self-test-status');
@@ -3154,7 +3359,10 @@
     const nextStep = document.getElementById('next-step');
     const nextStepCount = document.getElementById('next-step-count');
     const nextStepText = document.getElementById('next-step-text');
+    const nextStepPrev = document.getElementById('next-step-prev');
+    const nextStepNext = document.getElementById('next-step-next');
     const nextStepClose = document.getElementById('next-step-close');
+    const nextStepGuide = document.getElementById('next-step-guide');
 
     let lastSampleAt = 0;
     let monitorStartedAt = 0;
@@ -3270,20 +3478,11 @@
       }
     }
 
-    // Fallback for browsers without `closedby` support (notably Safari):
-    // `closedby="any"` gives light-dismiss declaratively in Chrome/Firefox.
-    // A click whose target is the dialog itself means the backdrop was hit.
-    if (!('closedBy' in HTMLDialogElement.prototype)) {
-      infoModal.addEventListener('click', (event) => {
-        if (event.target !== infoModal) return;
-        const rect = infoModal.getBoundingClientRect();
-        const isContent = (
-          rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
-          rect.left <= event.clientX && event.clientX <= rect.left + rect.width
-        );
-        if (!isContent) infoModal.close();
-      });
-    }
+    // Backdrop (light dismiss): click outside the content closes the dialog.
+    infoModal.addEventListener('click', (event) => {
+      if (event.target !== infoModal) return;
+      toggleModal(false);
+    });
 
     function announce(message) {
       if (!srAlerts) return;
@@ -3300,38 +3499,83 @@
       idle:  { count: '1/3', key: 'next.idle',
                zh: '步驟 1/3：點「開始分享監控畫面」，選擇要監控的視窗。' },
       place: { count: '2/3', key: 'next.place',
-               zh: '步驟 2/3：拖曳虛線探針到目標像素；移動後會自動重設基準。' },
+               zh: '步驟 2/3：拖曳十字準星到想取樣的像素位置。畫面會顯示區域編號，十字中央會顯示即時取樣顏色。準備好後按「下一步〉」繼續。' },
       live:  { count: '3/3', key: 'next.live',
                zh: '步驟 3/3：監控中，可調整靈敏度、暫停區域或測試警報。' },
       alarm: { count: '!',   key: 'next.alarm',
                zh: '警報響起中，請按「解除警報」停止。' },
     };
+    const STEP_ORDER = ['idle', 'place', 'live'];
     let nextStepKey = null;
+    let lastVisibleStepKey = 'idle';
     let nextStepDismissed = false;
+    let probeMovedSinceStart = false;
 
-    function setNextStep(state) {
+    function updateStepNav() {
+      const index = STEP_ORDER.indexOf(nextStepKey === 'alarm' ? 'live' : nextStepKey);
+      if (nextStepPrev) nextStepPrev.disabled = index <= 0;
+      if (nextStepNext) nextStepNext.disabled = index < 0 || index >= STEP_ORDER.length - 1;
+    }
+
+    function guidedState() {
+      if (alarmTimer) return 'alarm';
+      if (!stream) return 'idle';
+      // Step 2 remains visible after capture starts; only the user's Next
+      // button advances to Step 3.
+      return 'place';
+    }
+
+    function setGuideOpen(open) {
+      nextStepDismissed = !open;
+      if (nextStepGuide) nextStepGuide.hidden = open;
+
+      if (!open) {
+        if (nextStepKey && nextStepKey !== 'off') lastVisibleStepKey = nextStepKey;
+        setNextStep('off');
+        return;
+      }
+      let state = nextStepKey && nextStepKey !== 'off' ? nextStepKey : (lastVisibleStepKey || guidedState());
+      if (state === 'alarm' && !alarmTimer) state = guidedState();
+      setNextStep(state, { manual: true });
+      announce(nextStepText.textContent);
+    }
+
+    function setNextStep(state, options) {
       if (!nextStep || !nextStepText || !nextStepCount) return;
+      const manual = Boolean(options && options.manual);
       if (state === 'off' || nextStepDismissed) {
         nextStep.hidden = true;
         nextStep.dataset.visible = 'false';
         nextStepKey = null;
+        updateStepNav();
         return;
       }
       const item = NEXT_STEPS[state];
       if (!item) return;
       nextStepKey = state;
+      lastVisibleStepKey = state;
       nextStepCount.textContent = item.count;
       nextStepText.textContent = window.t(item.zh, window.tKey(item.key, item.zh));
       nextStep.hidden = false;
       nextStep.dataset.visible = 'true';
+      updateStepNav();
     }
 
-    if (nextStepClose) {
-      nextStepClose.addEventListener('click', () => {
-        nextStepDismissed = true;
-        setNextStep('off');
-      });
+    function navigateStep(step) {
+      if (nextStepDismissed) return;
+      const base = nextStepKey === 'alarm' ? 'live' : nextStepKey;
+      const index = STEP_ORDER.indexOf(base);
+      if (index < 0) return;
+      const targetIndex = Math.max(0, Math.min(STEP_ORDER.length - 1, index + step));
+      const target = STEP_ORDER[targetIndex];
+      setNextStep(target, { manual: true });
+      announce(nextStepText.textContent);
     }
+
+    if (nextStepPrev) nextStepPrev.addEventListener('click', () => navigateStep(-1));
+    if (nextStepNext) nextStepNext.addEventListener('click', () => navigateStep(1));
+    if (nextStepGuide) nextStepGuide.addEventListener('click', () => setGuideOpen(true));
+    if (nextStepClose) nextStepClose.addEventListener('click', () => setGuideOpen(false));
 
     function applyTransform() {
       zoomStage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomScale})`;
@@ -3432,7 +3676,6 @@
       alarmBanner.style.display = 'none';
       if (fromUser) {
         log(t('使用者已暫停警報音效', 'Alarm dismissed by user'));
-        if (stream) setNextStep('live');
       }
     }
 
@@ -3614,6 +3857,7 @@
 
     async function startCapture() {
       if (stream) return;
+      probeMovedSinceStart = false;
       stream = await navigator.mediaDevices.getDisplayMedia({ video: { cursor: "always" }, audio: false });
       video.srcObject = stream;
       placeholder.style.display = 'none';
@@ -3621,6 +3865,7 @@
       if (stageError) stageError.hidden = true;
       startBtn.classList.remove('needs-attention');
       nextStepDismissed = false;
+      if (nextStepGuide) nextStepGuide.hidden = true;
       setNextStep('place');
 
       let readyHandled = false;
@@ -3794,6 +4039,7 @@
       if (detectModeSelect.value === 'pixel') {
         zone.point = stagePointFromEvent(e, dragMetrics);
         zone.baseline = null;
+        if (stream) { probeMovedSinceStart = true; }
         placeProbe(zone, dragMetrics);
         return;
       }
@@ -3839,6 +4085,7 @@
       zone.point = zoneCenter(zone);
 
       zone.baseline = null;
+      if (stream) { probeMovedSinceStart = true; }
       updateBoxDOM(zone);
     }
 
@@ -3866,6 +4113,7 @@
           dragMetrics = readStageMetrics();
           zone.point = stagePointFromEvent(e, dragMetrics);
           zone.baseline = null;
+          if (stream) { probeMovedSinceStart = true; }
           placeProbe(zone, dragMetrics);
           document.body.classList.add('dragging-probe');
         }
@@ -3939,6 +4187,7 @@
         if (detectModeSelect.value !== 'pixel') zone.point = zoneCenter(zone);
 
         zone.baseline = null;
+        if (stream) { probeMovedSinceStart = true; }
         updateBoxDOM(zone);
         saveOptions();
         announce(t(`區域 ${zone.id} 已移動`, `Zone ${zone.id} moved`));
@@ -3988,7 +4237,9 @@
         monitorStartedAt = 0;
         lastSampleAt = 0;
         framesUntilFirstSample = 0;
+        probeMovedSinceStart = false;
         nextStepDismissed = false;
+        if (nextStepGuide) nextStepGuide.hidden = true;
         setNextStep('idle');
         updateHealth();
         if (wasActive) log(t('監控已結束', 'Monitoring stopped'));
@@ -4031,6 +4282,12 @@
       }
 
       lastSampleAt = Date.now();
+      const healthDotEl = document.getElementById('health-row')?.querySelector('.health-dot');
+      if (healthDotEl) {
+        healthDotEl.classList.remove('is-sampling');
+        void healthDotEl.offsetWidth; // force restart
+        healthDotEl.classList.add('is-sampling');
+      }
       sampleCount += 1;
       stallLogged = false;
 
@@ -4038,7 +4295,7 @@
       // left over from the previous capture or from the picker transition.
       if (sampleCount === 1) {
         zones.forEach(z => { z.baseline = null; });
-        setNextStep('live');
+        // Do not auto-advance: Step 2 stays until the user presses Next.
       }
 
       if (monitorStartedAt && lastSampleAt - lastHeartbeatAt >= 10 * 60 * 1000) {
@@ -4138,25 +4395,27 @@
     }
 
     /* ---------- long-run health ----------------------------------------- */
-    function formatSampleAge(ms) {
-      const seconds = Math.max(0, ms) / 1000;
-      const value = seconds < 10 ? seconds.toFixed(1) : String(Math.round(seconds));
-      return window.getLang() === 'en' ? `${value}s ago` : `${value} 秒前`;
+    function formatSampleTime(ts) {
+      if (!ts) return '--:--:--';
+      const d = new Date(ts);
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
     function updateHealth() {
       if (!healthRow) return;
       const active = Boolean(stream && monitorInterval);
+      const healthTime = document.getElementById('health-time');
       if (!active) {
         healthRow.dataset.state = 'idle';
         if (healthText) healthText.textContent = t('尚未開始取樣', 'No samples yet');
-        if (healthAge) healthAge.textContent = '';
+        if (healthTime) healthTime.textContent = '--:--:--';
         return;
       }
       if (!lastSampleAt) {
         healthRow.dataset.state = 'idle';
         if (healthText) healthText.textContent = t('等待第一次取樣…', 'Waiting for first sample…');
-        if (healthAge) healthAge.textContent = '';
+        if (healthTime) healthTime.textContent = '--:--:--';
         return;
       }
 
@@ -4167,7 +4426,7 @@
       if (healthText) healthText.textContent = stale
         ? t('取樣停頓', 'Sampling stalled')
         : t('取樣正常', 'Sampling OK');
-      if (healthAge) healthAge.textContent = formatSampleAge(age);
+      if (healthTime) healthTime.textContent = formatSampleTime(lastSampleAt);
 
       if (stale && !stallLogged) {
         stallLogged = true;
@@ -4392,6 +4651,7 @@
       status: $('#storageStatus'),
       current: $('#currentStyleName'),
       neuModeBtns: [...document.querySelectorAll('.neu-mode-btn[data-neu-mode]')],
+      modeToggle: $('#neuModeToggle'),
       reset: $('#resetStyle'),
       colorPicker: $('#custom-color-picker'),
     };
@@ -4439,7 +4699,7 @@
 
     const saved = storedLook();
     const state = {
-      style: STYLES[saved.style] ? saved.style : 'original',
+      style: STYLES[saved.style] ? saved.style : 'neumorph',
       remember: localStorage.getItem(P + ':remember') !== '0',
       colorTheme: saved.colorTheme || null,
       pattern: saved.pattern || null,
@@ -4484,6 +4744,18 @@
       els.neuModeBtns.forEach((btn) =>
         btn.setAttribute('aria-pressed', String(btn.dataset.neuMode === state.neuMode))
       );
+      if (els.modeToggle) {
+        const isNight = state.neuMode === 'night';
+        const modeToggle = els.modeToggle;
+        modeToggle.querySelectorAll('[data-mode-option]').forEach((opt) => {
+          opt.setAttribute('data-active', String((opt.dataset.modeOption === 'night') === isNight));
+        });
+        modeToggle.setAttribute('aria-pressed', String(isNight));
+        modeToggle.setAttribute('aria-label', isNight
+          ? window.tKey('header.modeToDay', modeToggle.dataset.zhToDay || 'Switch to Day mode (applies to all styles)')
+          : window.tKey('header.modeToNight', modeToggle.dataset.zhToNight || 'Switch to Night mode (applies to all styles)'));
+        modeToggle.title = window.tKey('header.modeTitle', 'Day / Night (applies to all styles)');
+      }
       els.current.textContent = styleLabel(state.style);
       els.remember.checked = state.remember;
     }
@@ -4677,6 +4949,11 @@
     els.neuModeBtns.forEach((btn) =>
       btn.addEventListener('click', () => setNeuMode(btn.dataset.neuMode))
     );
+    if (els.modeToggle) {
+      els.modeToggle.addEventListener('click', () =>
+        setNeuMode(state.neuMode === 'night' ? 'day' : 'night')
+      );
+    }
     els.open.addEventListener('click', () => {
       const willOpen = els.panel.hidden;
       els.panel.hidden = !willOpen;
@@ -4718,9 +4995,9 @@
       e.target.value = '';
     });
     els.reset.addEventListener('click', () => {
-      state.style = 'original';
+      state.style = 'neumorph';
       apply();
-      setStatus(t('已重設為原版外觀（配色與印花保持不變）。', 'Reset to the original look (palette and pattern unchanged).'));
+      setStatus(t('已重設為新擬態外觀（配色與印花保持不變）。', 'Reset to the Neumorphism look (palette and pattern unchanged).'));
     });
 
     /* Chrome can restore form values on reload — re-assert our state. */
